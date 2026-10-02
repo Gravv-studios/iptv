@@ -1,0 +1,1 @@
+export async function POST(){return Response.json({code:'INTEGRATIONS_NOT_CONFIGURED',error:'Cobranças reais estão desativadas. O fornecedor de IPTV e o serviço de pagamento ainda serão definidos.'},{status:503,headers:{'Cache-Control':'no-store'}});}
