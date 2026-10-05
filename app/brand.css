@@ -1,0 +1,57 @@
+/* Aperte Play: emerald is the identity; yellow marks the next action. */
+:root {
+  --brand-green: #22c975;
+  --brand-yellow: #f8d447;
+  --brand-ink: #071a11;
+  --accent: #087a4c;
+  --muted: #607469;
+  --line: #e1eae4;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 224px;
+  max-width: 100%;
+  line-height: 1;
+}
+.brand-logo img { display: block; width: 100%; height: auto; }
+.sidebar .brand-logo { width: 206px; padding: 0; }
+.sidebar { background: #081a11; }
+.nav-item.selected { background: #173b26; color: #f8d447; }
+.nav-item:hover { background: #153322; }
+.space-label { color: #9bae9f; }
+.help-box { border-color: #2c4b36; color: #aabdac; }
+.help-box button { color: #f8d447; }
+.help-box strong { color: #edf6ef; }
+.profile { border-color: #294733; }
+.subscription-card { background: linear-gradient(120deg, #0a492d, #082f20); }
+.subscription-card .button.white { background: #f8d447; color: #14291b; }
+.card-monogram { color: #4cdf8b16; font-size: 220px; letter-spacing: 0; top: 45px; right: 10px; }
+.button { background: var(--accent); }
+.button.secondary { background: #fff; border-color: #b9cebf; color: #225737; }
+.plan-card.featured { border-color: #138b52; background: #f8fcf8; }
+.plan-badge { background: #fff2ae; color: #5c4a08; }
+.demo-pill { background: #fff7d7; color: #665210; border-color: #efe0a0; }
+.icon-tile { background: #eaf5ed; color: #167c47; }
+.text-button { color: #147446; }
+.bubble.user, .chat-form button { background: #087a4c; color: white; }
+.device-tabs button.active { color: #116f40; background: #e9f5ec; border-color: #6bb887; }
+.payment-methods button.active { background: #eff8ee; border-color: #5aa86f; color: #236e3a; }
+.payment-methods button.active strong { color: #18592e; }
+.checkout-progress .active { color: #156b3c; border-color: #15974f; }
+@media (max-width: 850px) {
+  .sidebar .brand-logo { width: 166px; }
+}
+@media (max-width: 700px) {
+  .brand-logo { width: 180px; }
+  .sales-header { gap: 12px; }
+}
+@media (max-width: 420px) {
+  .sales-header .customer-link span { display: none; }
+  .sales-header .customer-link { padding: 10px 4px; }
+}
+@media (max-width: 600px) {
+  .sidebar .brand-logo { width: 212px; }
+}

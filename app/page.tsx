@@ -1,2 +1,2 @@
-import Portal from './portal';
-export default function Home(){return <Portal/>}
+import Storefront from './storefront';
+export default function Home(){return <Storefront/>}

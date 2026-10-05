@@ -1,0 +1,126 @@
+.purchase-header{border-bottom:1px solid #233c2e}
+.back-to-plans{display:flex;align-items:center;gap:6px;color:#b0c2b8;font-size:13px}
+.purchase-main{padding:40px 0 85px;max-width:1120px}
+.purchase-progress{display:flex;align-items:center;justify-content:center;gap:60px;margin-bottom:45px;color:#6d8075;font-size:13px}
+.purchase-progress>div{display:flex;align-items:center;gap:10px}
+.purchase-progress>div>span{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;border:1px solid #384b40;font-size:11px}
+.purchase-progress .current{color:#bee3ce}
+.purchase-progress .current>span{background:#95cbac;border-color:#95cbac;color:#172b20}
+.purchase-progress .complete{color:#9caca3}
+.purchase-progress .complete>span{background:#1d3226;color:#adc2b6}
+.purchase-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);gap:75px;align-items:start}
+.purchase-panel h1{font-size:31px;line-height:1.22;letter-spacing:-1px;outline:none;margin:0 0 13px}
+.purchase-panel>.sales-kicker{font-size:9px;letter-spacing:1.7px;margin:0 0 16px}
+.purchase-intro{font-size:15px;color:#9eb5a8;line-height:1.8;margin:0 0 27px}
+.purchase-label,.purchase-methods legend{display:block;color:#b8cdc1;font-size:14px;margin:0 0 12px}
+.purchase-panel select{width:100%;padding:16px;background:#17291f;color:#d3e6db;border:1px solid #374c40;border-radius:8px;font-size:14px}
+.purchase-methods{display:grid;grid-template-columns:1fr 1fr;gap:15px;border:0;padding:0;margin:27px 0 0}
+.purchase-methods label{padding:20px;background:#121e17;border:1px solid #2b4a38;border-radius:9px;position:relative;display:flex;flex-direction:column;gap:9px;color:#99b1a3;cursor:pointer}
+.purchase-methods label.selected{background:#1f3629;border-color:#82b598}
+.purchase-methods label input{position:absolute;top:20px;right:18px;accent-color:#a2d0b6;width:15px;height:15px}
+.purchase-methods label strong{font-size:15px;color:#dbebe2;margin-top:7px}
+.purchase-methods label span{font-size:12px}
+.method-footnote{font-size:11px;color:#7c9888;line-height:1.7;margin:11px 0 0}
+.purchase-callout{display:flex;gap:12px;align-items:flex-start;background:#15241b;border:1px solid #254031;border-radius:8px;padding:16px;margin:25px 0 19px;color:#92ae9e}
+.purchase-callout svg{flex-shrink:0;margin-top:2px}
+.purchase-callout p{font-size:13px;line-height:1.8;margin:0}
+.existing-access{font-size:12px;line-height:1.9;color:#96aea0;margin:18px 0}
+.existing-access strong{color:#b9d2c4;font-weight:500}
+.purchase-primary{width:100%;margin-top:9px}
+.purchase-fine{font-size:12px;line-height:1.8;color:#88a293;margin:16px 0 0}
+.purchase-summary{border:1px solid #294635;border-radius:12px;overflow:hidden;background:#101c15;position:sticky;top:30px}
+.summary-cover{padding:29px;position:relative;background:linear-gradient(90deg,#173122eb,#1f352899),url('/images/aperte-play-hero.png') 71% center/cover}
+.summary-cover>span{font-size:10px;letter-spacing:2px;color:#a8c6b5}
+.summary-cover svg{position:absolute;right:28px;top:26px;color:#9ec1ad}
+.summary-cover h2{font-size:24px;font-weight:500;letter-spacing:-.7px;margin:32px 0 8px}
+.summary-cover p{font-size:13px;color:#a8c3b4;margin:0}
+.summary-body{padding:25px 28px}
+.summary-body>div{display:flex;justify-content:space-between;gap:15px;margin-bottom:18px;font-size:13px}
+.summary-body>div>span{color:#90aa9b}
+.summary-body>div>strong{font-weight:500;color:#c5ded0}
+.summary-body .summary-total{margin:23px 0 0;padding-top:23px;border-top:1px solid #223b2d;align-items:baseline}
+.summary-total strong{font-size:30px;font-weight:600!important;letter-spacing:-1px;color:#daece2!important}
+.summary-total span{font-size:15px;color:#bed9ca!important}
+.summary-body>p{font-size:11px;color:#728d7e;line-height:1.6;margin:7px 0 26px}
+.summary-body ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:15px}
+.summary-body li{display:flex;align-items:center;gap:10px;font-size:12px;color:#a0b9ab}
+.summary-body li svg{color:#88a896}
+.summary-bottom{padding:18px 28px;border-top:1px solid #213a2c;color:#7d9a89;display:flex;gap:10px;align-items:center}
+.summary-bottom p{font-size:11px;line-height:1.7;margin:0}
+.summary-bottom svg{flex-shrink:0}
+.purchase-footer{border-top:1px solid #1d3226;margin:0;padding:25px 56px;display:flex;gap:15px;align-items:center;font-size:12px;color:#87a092}
+.purchase-footer span{color:#698173}
+.purchase-footer>a{margin-left:auto;color:#a1bcad}
+.payment-demo-block{border:1px solid #3d5849;background:#1a2e23;border-radius:11px;padding:30px;text-align:center;color:#9eccb2}
+.payment-demo-block>svg{margin:auto auto 20px}
+.payment-demo-block h2{font-size:22px;color:#c5e1d1;letter-spacing:-.6px}
+.payment-demo-block p{font-size:14px;color:#96b6a4;line-height:1.9;margin:15px 0 23px}
+.payment-demo-block>span{font-size:10px;letter-spacing:1px;color:#accdba;border-radius:5px;background:#233c2e;padding:8px 12px;display:inline-block}
+.purchase-order-row{display:flex;justify-content:space-between;gap:15px;margin:23px 0;font-size:12px;color:#97b7a5}
+.purchase-order-row strong{color:#bddac9;font-weight:500}
+.purchase-cancel,.purchase-help{display:block;margin:20px auto 0;text-align:center;background:none;color:#a7c4b3;font-size:13px}
+.purchase-success{display:flex;align-items:center;gap:17px;padding:23px 0}
+.purchase-success>span{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:#1e3e34;color:#9cceb6}
+.purchase-success h2{font-size:19px;letter-spacing:-.5px;margin:0 0 7px}
+.purchase-success p{font-size:14px;margin:0;color:#91ac9d}
+.purchase-credentials{border:1px solid #3e594a;background:#17281e;border-radius:10px;padding:5px 22px;margin:15px 0 20px}
+.purchase-credentials>div{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:19px 0;border-bottom:1px solid #274333}
+.purchase-credentials>div:last-child{border:0}
+.purchase-credentials span{display:block;width:100%;font-size:12px;color:#8fae9c}
+.purchase-credentials strong{font-family:monospace;font-weight:500;font-size:14px;color:#d4eddf;margin-right:auto;overflow-wrap:anywhere}
+.purchase-credentials button{background:none;color:#98c3ab;padding:5px}
+.purchase-error{border:1px solid #784145;background:#1d3326;color:#f0b4bd;border-radius:8px;padding:15px;font-size:14px;margin-bottom:20px}
+.purchase-error p{margin:0}
+.purchase-error button{background:none;color:inherit;text-decoration:underline;padding:9px 0}
+.purchase-status{font-size:13px;color:#a6cab5}
+.purchase-toast{font-size:13px;color:#b7d8c9;border-radius:7px;background:#213129;padding:13px;margin-top:17px}
+.purchase-signin{display:block;text-decoration:underline;color:#afcfbd;font-size:14px;margin:15px 0}
+.invalid-plan{padding:80px 30px;max-width:700px;margin:auto;text-align:center}
+.invalid-plan h1{font-size:27px}
+.invalid-plan a{color:#609a79;text-decoration:underline}
+@media(max-width:1000px){.purchase-grid{gap:35px}
+.purchase-panel h1{font-size:28px}
+.purchase-progress{gap:36px}
+.summary-cover,.summary-body{padding:25px}
+.purchase-methods label{padding:18px}
+.purchase-footer{padding:25px 30px}
+}
+@media(max-width:700px){.purchase-main{padding:30px 0 55px}
+.purchase-progress{gap:15px;margin-bottom:32px;font-size:11px}
+.purchase-progress>div{gap:7px}
+.purchase-progress>div>span{width:22px;height:22px}
+.purchase-grid{grid-template-columns:1fr;gap:35px}
+.purchase-panel h1{font-size:28px;max-width:340px}
+.purchase-header{padding:0 22px}
+.back-to-plans{font-size:12px}
+.purchase-intro{font-size:15px}
+.purchase-summary{position:static}
+.purchase-footer{padding:25px 22px;flex-wrap:wrap}
+.purchase-footer>span{font-size:11px}
+.purchase-methods label{padding:18px}
+.purchase-order-row{font-size:11px}
+.payment-demo-block{padding:25px}
+.purchase-success h2{font-size:17px}
+.purchase-credentials strong{font-size:13px}
+}
+
+
+.purchase-header{border-color:#2c4c35}
+.purchase-progress .current{color:#f8d447}.purchase-progress .current>span{background:#f8d447;border-color:#f8d447;color:#243115}
+.purchase-intro,.purchase-label,.purchase-methods legend{color:#bfd2c4}
+.purchase-panel select{color:#e6f3e7;background:#142e1f;border-color:#40674a}
+.purchase-methods label{background:#10291b;border-color:#31533b;color:#bdd1c2}
+.purchase-methods label.selected{background:#1a3d25;border-color:#f8d447}
+.purchase-methods label input{accent-color:#f8d447}
+.purchase-methods label strong{color:#eef8ec}
+.purchase-callout{background:#122b1e;border-color:#2c5038;color:#b8cebe}
+.summary-cover{background:linear-gradient(90deg,#0d301eea,#123c2e99),url('/images/aperte-play-hero.png') 71% center/cover}
+.summary-cover>span,.summary-cover svg{color:#f8d447}
+.summary-total strong{color:#fff5bb!important}.summary-total span{color:#d5e6d8!important}
+.purchase-summary{background:#0d2418;border-color:#315039}
+.purchase-credentials{background:#102c1c;border-color:#3b6748}
+.purchase-credentials strong{color:#e9f5e9}
+.payment-demo-block{background:#173921;border-color:#426f4b;color:#f8d447}
+.payment-demo-block h2{color:#ecf6e6}
+.purchase-status,.purchase-signin{color:#a6d7b6}
+.invalid-plan a{color:#087a4c}

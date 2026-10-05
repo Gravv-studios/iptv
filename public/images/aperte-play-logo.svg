@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1076 112" role="img" aria-label="Aperte Play">
+  <defs>
+    <clipPath id="cap"><rect x="-40" y="0" width="1000" height="100"/></clipPath>
+  </defs>
+  <!-- Button being pressed: the darker base shows under the raised key. -->
+  <rect x="0" y="12" width="100" height="100" rx="24" fill="#0c8a4c"/>
+  <rect x="0" y="2" width="100" height="100" rx="24" fill="#22c975"/>
+  <path d="M38 30v44l38-22z" fill="#f8d447" stroke="#f8d447" stroke-width="8" stroke-linejoin="round"/>
+  <!-- Wordmark drawn as strokes so it renders the same on every device. -->
+  <g transform="translate(154 6) skewX(-10)">
+    <g clip-path="url(#cap)" fill="none" stroke-width="22" stroke-linejoin="miter" stroke-miterlimit="10">
+      <g stroke="#22c975">
+        <path d="M1 120 45 0l44 120M22 71h46"/>
+        <path transform="translate(104)" d="M11 0v100M11 11h33a25 25 0 0 1 0 50H11"/>
+        <path transform="translate(198)" d="M66 11H11v78h55M11 50h45"/>
+        <path transform="translate(278)" d="M11 0v100M11 11h33a25 25 0 0 1 0 50H11M42 61l36 51"/>
+        <path transform="translate(374)" d="M0 11h76M38 0v100"/>
+        <path transform="translate(464)" d="M66 11H11v78h55M11 50h45"/>
+      </g>
+      <g stroke="#f8d447">
+        <path transform="translate(574)" d="M11 0v100M11 11h33a25 25 0 0 1 0 50H11"/>
+        <path transform="translate(668)" d="M11 0v89h49"/>
+        <path transform="translate(742)" d="M1 120 45 0l44 120M22 71h46"/>
+        <path transform="translate(826)" d="M-6 -20 43 54 92 -20M43 52v48"/>
+      </g>
+    </g>
+  </g>
+</svg>

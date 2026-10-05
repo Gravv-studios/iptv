@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./brand.css";
 
 export const metadata: Metadata = {
-  title: "Lume TV · Seu acesso, em um só lugar",
-  description: "Assinatura, renovação e acesso IPTV. Demonstração privada.",
+  title: "Aperte Play · Seu momento começa com um play",
+  description: "Solicite 6 horas grátis de Aperte Play pelo WhatsApp. Planos mensal por R$ 25, semestral por R$ 100 e anual por R$ 170. Pagamentos no site em demonstração.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

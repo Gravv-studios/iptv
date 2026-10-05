@@ -13,15 +13,15 @@ let s=await request({action:'reset',confirm:'RESET_DEMO',scenario:'new'});check(
 check((await request({action:'create',planId:'invalid',method:'pix',requestKey:crypto.randomUUID()})).status,400,'Unknown plan rejected');
 const key=crypto.randomUUID();
 const first=await request({action:'create',planId:'mensal',method:'pix',requestKey:key,amount:1});
-check(first.status,200,'Create order');check(first.data.orders[0].amount,2990,'Server controls price');check(first.data.account.expires_at,0,'Pending payment must not activate access');
+check(first.status,200,'Create order');check(first.data.orders[0].amount,2500,'Server controls price');check(first.data.account.expires_at,0,'Pending payment must not activate access');
 const repeat=await request({action:'create',planId:'mensal',method:'pix',requestKey:key});check(first.data.orderId,repeat.data.orderId,'Creation is idempotent');check(repeat.data.orders.length,1,'One order per request');
 const id=first.data.orderId;const confirmations=await Promise.all([request({action:'confirm',orderId:id}),request({action:'confirm',orderId:id})]);
 check(confirmations.map(x=>x.status),[200,200],'Concurrent duplicate confirmation succeeds safely');
 s=await request();const firstExpiry=s.data.account.expires_at;assert.ok(firstExpiry>Date.now()+29*86400000&&firstExpiry<Date.now()+31*86400000);checks++;
 check(s.data.orders[0].applied,1,'Order fulfilled exactly once');
 const again=await request({action:'confirm',orderId:id});check(again.data.account.expires_at,firstExpiry,'Duplicate does not add more days');
-const renewal=await request({action:'create',planId:'trimestral',method:'card',requestKey:crypto.randomUUID()});
-const renewed=await request({action:'confirm',orderId:renewal.data.orderId});check(renewed.data.account.expires_at,firstExpiry+90*86400000,'Renewal preserves remaining days');
+const renewal=await request({action:'create',planId:'anual',method:'card',requestKey:crypto.randomUUID()});
+const renewed=await request({action:'confirm',orderId:renewal.data.orderId});check(renewed.data.account.expires_at,firstExpiry+365*86400000,'Renewal preserves remaining days');
 const cancelled=await request({action:'create',planId:'mensal',method:'pix',requestKey:crypto.randomUUID()});
 await request({action:'cancel',orderId:cancelled.data.orderId});check((await request({action:'confirm',orderId:cancelled.data.orderId})).status,400,'Cancelled order cannot activate');
 check((await request({action:'confirm',orderId:crypto.randomUUID()})).status,400,'Unknown order rejected');
