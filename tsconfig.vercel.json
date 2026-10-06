@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {"incremental": true, "tsBuildInfoFile": ".next-vercel/cache/typescript.tsbuildinfo"},
+  "include": ["next-vercel-env.d.ts", "cloudflare-env.d.ts", "app/**/*.ts", "app/**/*.tsx", "components/**/*.ts", "components/**/*.tsx", "lib/**/*.ts", ".next-vercel/types/**/*.ts"],
+  "exclude": ["node_modules", "build", "examples", ".next", "dist", "next-env.d.ts"]
+}

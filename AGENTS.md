@@ -21,7 +21,9 @@ Preferência expressa por Marcos em 06/10/2026.
 
 ## Ambiente e validação
 
-- O site continua em localhost até Marcos definir a hospedagem. Enviar código ao GitHub não autoriza publicar o site ou alterar DNS.
+- Marcos definiu a Vercel em 06/10/2026 e autorizou corrigir a publicação em `iptv-nine-drab.vercel.app`, projeto `gravv-studios/iptv`. Atualizações autorizadas enviadas para `origin/main` acionam a publicação ligada ao GitHub. Manter também a prévia local. Não alterar DNS sem solicitação.
+- Para Vercel, usar `npm run build:vercel` e `vercel.json`; não publicar `dist/` do Worker como arquivos estáticos. Conferir o deployment e a URL pública antes de afirmar que a atualização está online.
+- Na publicação atual, contratação e suporte seguem pelo WhatsApp. Login, pagamento e emissão de acesso reais continuam pendentes; não confiar em headers de identidade do Sites enviados pela internet.
 - Usar verificações proporcionais à alteração. `scripts/test-commercial-offer.mjs` não altera a conta de apresentação.
 - `scripts/test-demo.mjs` reinicializa dados da demonstração: não executar sem uma necessidade autorizada de reset.
 - Pagamentos e provisionamento continuam em demonstração até as integrações reais serem configuradas e verificadas.

@@ -1,4 +1,4 @@
-import {env} from 'cloudflare:workers';
+import {env} from '@/lib/platform-env';
 import {DAY,assistantReply,getPlan,type Account,type Snapshot} from './domain';
 export function database(){if(!env.DB)throw new Error('DATABASE_UNAVAILABLE');return env.DB;}
 export async function initialize(userId:string){

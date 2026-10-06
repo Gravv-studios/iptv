@@ -1,0 +1,45 @@
+.ap-public{min-height:100svh}
+.ap-service-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.8fr);gap:72px;padding-top:64px;padding-bottom:72px;max-width:1060px}
+.ap-service-copy .ap-service-kicker{font-size:12px;font-weight:700;letter-spacing:1.8px;color:var(--ap-yellow);margin-bottom:18px}
+.ap-service-copy h1{font-size:clamp(32px,4vw,46px);line-height:1.15;letter-spacing:-1.5px;margin-bottom:22px}
+.ap-service-copy h1 span{color:var(--ap-green)}
+.ap-service-copy>p{color:var(--ap-muted);font-size:16px;line-height:1.8}
+.ap-public .ap-periods{margin-top:30px}
+.ap-periods legend{color:var(--ap-text);font-size:14px;margin-bottom:14px}
+.ap-periods label{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--ap-line);border-radius:12px;margin-bottom:10px;background:var(--ap-surface);cursor:pointer}
+.ap-periods label.selected{border-color:var(--ap-green);background:#10231a}
+.ap-periods input{accent-color:var(--ap-green);width:18px;height:18px;flex-shrink:0}
+.ap-periods label>span{flex:1;display:grid;gap:3px}
+.ap-periods label>strong{font-size:17px;white-space:nowrap}
+.ap-periods small{color:var(--ap-muted);font-size:12px}
+.ap-periods label:focus-within{outline:2px solid var(--ap-yellow);outline-offset:3px}
+.ap-service-note{display:flex;gap:12px;margin-top:20px;color:var(--ap-muted);font-size:13px;line-height:1.7}
+.ap-service-note svg{flex-shrink:0;color:var(--ap-green);margin-top:3px}
+.ap-order-card{padding:30px;background:var(--ap-surface);border:1px solid var(--ap-line);border-radius:22px;align-self:start}
+.ap-order-card>svg{color:var(--ap-green);margin-bottom:20px}
+.ap-order-card h2{font-size:23px;letter-spacing:-.6px;margin-bottom:5px}
+.ap-order-card>p{color:var(--ap-muted);font-size:14px}
+.ap-order-total{display:grid;gap:8px;border-top:1px solid var(--ap-line);border-bottom:1px solid var(--ap-line);padding:22px 0;margin:24px 0}
+.ap-order-total span{font-size:13px;color:var(--ap-muted)}
+.ap-order-total strong{font-size:42px;line-height:1;letter-spacing:-1.5px;color:var(--ap-yellow)}
+.ap-order-card ul{display:grid;gap:13px;margin-bottom:28px;font-size:13px;color:#d5d9e1}
+.ap-order-card li{display:flex;align-items:center;gap:10px}
+.ap-order-card li svg{color:var(--ap-green);flex-shrink:0}
+.ap-order-card .ap-button{width:100%;padding:14px 12px;font-size:15px}
+.ap-public .ap-service-fine{font-size:12px;line-height:1.8;color:var(--ap-muted);margin-top:15px}
+.ap-public .ap-trial-alternative{display:inline-block;color:var(--ap-text);text-decoration:underline;text-underline-offset:4px;font-size:13px;line-height:1.7;padding:12px 0;margin-top:12px}
+.ap-service-footer{border-top:1px solid var(--ap-line);padding-top:24px;padding-bottom:28px;color:var(--ap-muted);font-size:12px}
+.ap-support-main{display:block;max-width:760px;min-height:calc(100svh - 145px)}
+.ap-support-topics{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0}
+.ap-support-topics>span{display:flex;align-items:center;gap:10px;padding:14px 16px;border:1px solid var(--ap-line);background:var(--ap-surface);border-radius:12px;font-size:13px}
+.ap-support-topics svg{color:var(--ap-green)}
+@media(max-width:760px){
+ .ap-service-main{grid-template-columns:1fr;gap:28px;padding-top:32px;padding-bottom:38px}
+ .ap-service-copy h1{font-size:34px;letter-spacing:-1px}
+ .ap-service-copy>p{font-size:15px}
+ .ap-order-card{padding:24px 20px;border-radius:18px}
+ .ap-support-main .ap-button{width:100%;font-size:15px}
+ .ap-support-topics{gap:8px}
+ .ap-support-topics>span{padding:12px}
+ .ap-public .ap-header .brand-logo{width:145px}
+}

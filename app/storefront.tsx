@@ -5,6 +5,7 @@ import {ArrowRight, Baby, Check, ChevronDown, CircleHelp, Clapperboard, Film, He
 import {plans, money} from '../lib/domain';
 import {trialHours, trialUrlForDevice, whatsappDisplay, type TrialDevice} from '../lib/offer';
 import {BrandLogo} from '../components/brand-logo';
+import {isVercelHosted} from '../lib/hosting';
 import './mobile-storefront.css';
 
 const devices: {id: TrialDevice; label: string; Icon: typeof Tv; guidance: string}[] = [
@@ -37,8 +38,8 @@ const faqs = [
   {q: 'Preciso cadastrar um cartão?', a: 'Não. O teste é gratuito, sem cartão e sem cobrança automática. Você só paga se decidir contratar um plano depois.'},
   {q: 'Vai funcionar no meu aparelho?', a: 'Conte à equipe qual é o modelo da sua TV, celular, tablet ou computador. Ela confirma a compatibilidade e o aplicativo indicado antes de ativar seu teste. Escolher um aparelho aqui não garante compatibilidade.'},
   {q: 'O que acontece quando o teste acaba?', a: 'Você decide se quer continuar. Escolha o mensal por R$ 25, o semestral por R$ 100 ou o anual por R$ 170. O teste não se transforma em assinatura automaticamente.'},
-  {q: 'Quais conteúdos estão disponíveis?', a: 'Peça o catálogo à equipe antes de contratar. A lista de conteúdos depende do fornecedor e ainda precisa ser confirmada nesta apresentação. As imagens do site são ilustrativas.'},
-  {q: 'Como faço para comprar ou renovar?', a: 'Escolha um plano e siga para o pagamento. O fluxo prevê Pix e cartão, e a renovação é solicitada pela área do cliente. Nesta apresentação, os pagamentos e a entrega do acesso são simulados: não há cobrança real nem renovação automática.'},
+  {q: 'Quais conteúdos estão disponíveis?', a: 'Peça o catálogo à equipe antes de contratar. A lista de conteúdos depende do fornecedor e deve ser confirmada com o atendimento. As imagens do site são ilustrativas.'},
+  {q: 'Como faço para comprar ou renovar?', a: isVercelHosted ? 'Escolha um plano, confira o valor total e continue pelo WhatsApp. A equipe confirma a compatibilidade do seu aparelho e orienta o pagamento e a ativação. Para renovar, use o atendimento na área do cliente. Ainda não há pagamento nem renovação automática pelo site.' : 'Escolha um plano e siga para o pagamento. O fluxo prevê Pix e cartão, e a renovação é solicitada pela área do cliente. Nesta apresentação, os pagamentos e a entrega do acesso são simulados: não há cobrança real nem renovação automática.'},
 ];
 
 export default function Storefront() {
@@ -64,7 +65,7 @@ export default function Storefront() {
 
   return (
     <div className="ap-site" ref={pageRef}>
-      <div className="ap-demo">Prévia do site <span>·</span> Compras em demonstração, sem cobrança real.</div>
+      <div className="ap-demo">{isVercelHosted ? <>6 horas grátis para experimentar <span>·</span> Atendimento pelo WhatsApp</> : <>Prévia do site <span>·</span> Compras em demonstração, sem cobrança real.</>}</div>
       <header className="ap-header">
         <div className="ap-container ap-header-inner">
           <BrandLogo/>
@@ -148,13 +149,13 @@ export default function Storefront() {
                   <p className="ap-plan-period">{plan.period} de acesso</p>
                   <p className="ap-plan-amount">{money(plan.amount)}</p>
                   <p className="ap-plan-note">{months > 1 ? <>Equivale a {money(Math.round(plan.amount / months))} por mês · <strong>economize {money(plans[0].amount * months - plan.amount)}</strong></> : 'Um mês para aproveitar'}</p>
-                  <ul><li><UserRound size={16}/>Seu acesso na área do cliente</li><li><Headphones size={16}/>Orientações para configurar</li><li><ShieldCheck size={16}/>Você escolhe quando renovar</li></ul>
+                  <ul><li><UserRound size={16}/>{isVercelHosted ? 'Ativação orientada pela equipe' : 'Seu acesso na área do cliente'}</li><li><Headphones size={16}/>Orientações para configurar</li><li><ShieldCheck size={16}/>Você escolhe quando renovar</li></ul>
                   <a className={'ap-button ' + (featured ? '' : 'ap-button-ghost')} href={'/comprar?plano=' + plan.id}>Escolher {name.toLowerCase()}<ArrowRight size={18}/></a>
                 </article>
               );
             })}
           </div>
-          <p className="ap-plan-disclaimer">Sem renovação automática. Pagamento em demonstração. <a href="#teste">Prefiro experimentar primeiro</a></p>
+          <p className="ap-plan-disclaimer">{isVercelHosted ? 'Contratação pelo WhatsApp. Sem renovação automática.' : 'Sem renovação automática. Pagamento em demonstração.'} <a href="#teste">Prefiro experimentar primeiro</a></p>
         </section>
 
         <section className="ap-section ap-faq ap-container" id="duvidas" aria-labelledby="ap-faq-title">

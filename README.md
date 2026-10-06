@@ -2,6 +2,18 @@
 
 Site de vendas e área do cliente para demonstrar a contratação, entrega e renovação de acessos IPTV.
 
+## Publicação na Vercel — 06/10/2026
+
+Marcos escolheu a Vercel para publicar este repositório. `vercel.json` fixa o framework Next.js, o comando `npm run build:vercel` e a saída `.next-vercel`. O build anterior do Vinext produzia um Worker da Cloudflare; publicá-lo como arquivos estáticos causava 404 mesmo com o deployment marcado como Ready.
+
+A página inicial mantém a identidade aprovada, as 6 horas grátis e a tabela comercial. Na Vercel, `/comprar` apresenta o plano e abre o WhatsApp com preço total e período; `/area-do-cliente` oferece atendimento e informa que o portal com login está em preparação. Nenhuma mensagem é enviada automaticamente. Não há pagamento, acesso IPTV, autenticação de cliente ou banco de clientes reais configurados nesta publicação.
+
+Os headers de identidade do Sites não são aceitos como autenticação em requisições públicas da Vercel. O acesso ao D1 permanece exclusivo da demonstração local/Sites; a publicação não utiliza banco compartilhado em memória nem exibe uma conta fictícia como se fosse do visitante. O endpoint real de cobrança continua bloqueado com 503. A API de demonstração permite somente a prévia fictícia não autenticada e rejeita gravações.
+
+O ambiente local Vinext continua com `npm run dev` na porta 5173 e preserva a demonstração original. Para verificar o mesmo build da Vercel, executar `npm run build:vercel`, depois `npm run start:vercel -- --hostname 127.0.0.1 --port 5180`. `node scripts/test-vercel.mjs` valida esse servidor sem criar pedidos; `node scripts/test-commercial-offer.mjs` confere a oferta. Os tipos do Next e do Vinext ficam em configurações e diretórios separados.
+
+Esta decisão substitui a orientação anterior de manter exclusivamente em localhost. As instruções antigas abaixo registram a evolução do projeto. Atualizações continuam sendo enviadas ao GitHub somente quando solicitadas, com um commit por alteração concluída; a integração da Vercel publica esses commits.
+
 ## Página inicial em estilo streaming — 05/10/2026
 
 A pedido de Marcos, a página inicial foi refeita em `app/storefront.tsx` e `app/mobile-storefront.css`: fundo neutro escuro, verde como cor de ação e amarelo só para destaques; foto da sala em tela cheia no topo; nova seção de conteúdo com seis categorias e aparelhos; três cartões de plano, cada um com seu botão de compra, e o anual em destaque. Compra e área do cliente mantêm o visual anterior.
