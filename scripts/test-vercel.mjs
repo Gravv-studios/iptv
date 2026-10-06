@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 
 // Read-only checks, plus rejected demo/payment requests. Never creates an order.
 const base = process.argv[2] ?? 'http://127.0.0.1:5180';
+const configuration = await fetch(`${base}/api/checkout`);
+const checkout = await configuration.json();
+assert.equal(checkout.ready, false, 'This test only runs against the not-yet-activated checkout.');
+assert.equal(checkout.publicKey, null);
 const home = await fetch(base);
 assert.equal(home.status, 200);
 const html = await home.text();
@@ -12,12 +16,13 @@ for (const id of ['mensal', 'semestral', 'anual']) {
   const page = await fetch(`${base}/comprar?plano=${id}`);
   assert.equal(page.status, 200);
   const body = await page.text();
-  assert.match(body, /Contratar pelo WhatsApp/);
-  const raw = body.match(/href="(https:\/\/wa\.me\/5533984622431\?text=[^"]+)"/);
-  assert.ok(raw, 'Purchase has the approved WhatsApp recipient.');
-  const message = new URL(raw[1].replaceAll('&amp;', '&')).searchParams.get('text');
+  assert.match(body, /Seu pagamento aqui/);
+  assert.match(body, /Mercado Pago/);
+  assert.match(body, /Pagamento em ativação/);
+  assert.doesNotMatch(body, /Contratar pelo WhatsApp/);
   const plan = {mensal: ['Mensal', '25,00', '1 mês'], semestral: ['Semestral', '100,00', '6 meses'], anual: ['Anual', '170,00', '12 meses']}[id];
-  for (const value of plan) assert.ok(message.includes(value), `Purchase message contains ${value}.`);
+  for (const value of plan) assert.ok(body.includes(value), `Checkout contains ${value}.`);
+  assert.match(body, /5533984622431/, 'Trial keeps the approved recipient.');
 }
 const invalid = await fetch(`${base}/comprar?plano=inexistente`);
 assert.match(await invalid.text(), /Esse plano não foi encontrado/);
@@ -36,7 +41,11 @@ const write = await fetch(`${base}/api/demo`, {method:'POST', headers:{...forged
 assert.equal(write.status, 401, 'A public request cannot write into the local demo database.');
 const payment = await fetch(`${base}/api/checkout`, {method:'POST'});
 assert.equal(payment.status, 503);
-assert.equal((await payment.json()).code, 'INTEGRATIONS_NOT_CONFIGURED');
+assert.equal((await payment.json()).code, 'PAYMENTS_NOT_CONFIGURED');
+for (const endpoint of ['/api/checkout/pay','/api/payments/webhook']) {
+  assert.equal((await fetch(base + endpoint, {method:'POST'})).status, 503);
+}
+assert.equal((await fetch(`${base}/api/checkout/orders/00000000-0000-4000-8000-000000000000`)).status, 503);
 for (const route of ['/signin-with-chatgpt', '/signout-with-chatgpt']) {
   const response = await fetch(base + route, {redirect:'manual'});
   assert.equal(response.status, 307);
@@ -44,4 +53,4 @@ for (const route of ['/signin-with-chatgpt', '/signout-with-chatgpt']) {
 }
 assert.equal((await fetch(`${base}/images/aperte-play-logo.svg`)).status, 200);
 assert.equal((await fetch(`${base}/pagina-inexistente`)).status, 404);
-console.log('Vercel checks passed: storefront, three prices and WhatsApp messages, customer support, rejected forged identity, disabled payment, legacy links, logo and 404. No account data changed.');
+console.log('Vercel checks passed: storefront, three checkout plans, Mercado Pago activation state, customer support, rejected forged identity, disabled payment routes, legacy links, logo and 404. No orders or charges created.');

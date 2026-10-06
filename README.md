@@ -4,6 +4,8 @@ Site de vendas e área do cliente para demonstrar a contratação, entrega e ren
 
 ## Publicação na Vercel — 06/10/2026
 
+Atualização de pagamentos: o checkout agora foi construído para receber no site por Mercado Pago (Pix, cartões e boleto), com pedidos persistentes em PostgreSQL, idempotência e confirmação por webhook assinado/consulta ao provedor. A conta de recebimento ainda será criada; credenciais e banco não estão configurados. A página mostra **Pagamento online em ativação**, sem criar cobranças. Ver [PAGAMENTOS.md](PAGAMENTOS.md) para configuração, testes e limites. A liberação do IPTV segue pendente de integração e, após o pagamento, depende da equipe. A descrição a seguir registra a publicação anterior ao checkout.
+
 Marcos escolheu a Vercel para publicar este repositório. `vercel.json` fixa o framework Next.js, o comando `npm run build:vercel` e a saída `.next-vercel`. O build anterior do Vinext produzia um Worker da Cloudflare; publicá-lo como arquivos estáticos causava 404 mesmo com o deployment marcado como Ready.
 
 A página inicial mantém a identidade aprovada, as 6 horas grátis e a tabela comercial. Na Vercel, `/comprar` apresenta o plano e abre o WhatsApp com preço total e período; `/area-do-cliente` oferece atendimento e informa que o portal com login está em preparação. Nenhuma mensagem é enviada automaticamente. Não há pagamento, acesso IPTV, autenticação de cliente ou banco de clientes reais configurados nesta publicação.

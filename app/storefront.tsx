@@ -39,7 +39,7 @@ const faqs = [
   {q: 'Vai funcionar no meu aparelho?', a: 'Conte à equipe qual é o modelo da sua TV, celular, tablet ou computador. Ela confirma a compatibilidade e o aplicativo indicado antes de ativar seu teste. Escolher um aparelho aqui não garante compatibilidade.'},
   {q: 'O que acontece quando o teste acaba?', a: 'Você decide se quer continuar. Escolha o mensal por R$ 25, o semestral por R$ 100 ou o anual por R$ 170. O teste não se transforma em assinatura automaticamente.'},
   {q: 'Quais conteúdos estão disponíveis?', a: 'Peça o catálogo à equipe antes de contratar. A lista de conteúdos depende do fornecedor e deve ser confirmada com o atendimento. As imagens do site são ilustrativas.'},
-  {q: 'Como faço para comprar ou renovar?', a: isVercelHosted ? 'Escolha um plano, confira o valor total e continue pelo WhatsApp. A equipe confirma a compatibilidade do seu aparelho e orienta o pagamento e a ativação. Para renovar, use o atendimento na área do cliente. Ainda não há pagamento nem renovação automática pelo site.' : 'Escolha um plano e siga para o pagamento. O fluxo prevê Pix e cartão, e a renovação é solicitada pela área do cliente. Nesta apresentação, os pagamentos e a entrega do acesso são simulados: não há cobrança real nem renovação automática.'},
+  {q: 'Como faço para comprar ou renovar?', a: isVercelHosted ? 'Escolha um plano e abra o checkout no site. O pagamento com Pix, cartões e boleto será processado pelo Mercado Pago assim que a conta recebedora for ativada. A página informa quando estiver disponível. A ativação do acesso e as renovações são orientadas pela equipe, sem renovação automática.' : 'Escolha um plano e siga para o pagamento. O fluxo prevê Pix e cartão, e a renovação é solicitada pela área do cliente. Nesta apresentação, os pagamentos e a entrega do acesso são simulados: não há cobrança real nem renovação automática.'},
 ];
 
 export default function Storefront() {
@@ -155,7 +155,7 @@ export default function Storefront() {
               );
             })}
           </div>
-          <p className="ap-plan-disclaimer">{isVercelHosted ? 'Contratação pelo WhatsApp. Sem renovação automática.' : 'Sem renovação automática. Pagamento em demonstração.'} <a href="#teste">Prefiro experimentar primeiro</a></p>
+          <p className="ap-plan-disclaimer">{isVercelHosted ? 'Checkout no site com Mercado Pago em ativação. Sem renovação automática.' : 'Sem renovação automática. Pagamento em demonstração.'} <a href="#teste">Prefiro experimentar primeiro</a></p>
         </section>
 
         <section className="ap-section ap-faq ap-container" id="duvidas" aria-labelledby="ap-faq-title">
