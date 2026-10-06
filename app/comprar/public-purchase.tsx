@@ -9,6 +9,7 @@ import {getPlan, money, plans} from '../../lib/domain';
 import {trialUrl} from '../../lib/offer';
 import {customerSupportUrl} from '../../lib/sales';
 import {paymentLabels, type PublicOrder} from '../../lib/payments/types';
+import {PaymentInstructions} from '../../components/payment-instructions';
 import '../mobile-storefront.css';
 import '../public-service.css';
 import './payment.css';
@@ -125,9 +126,10 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
           {(step === 3 || uncertain) && <div className={'mp-result ' + (order.status === 'approved' ? 'approved' : '')} role="status">
             {order.status === 'approved' ? <CheckCircle2 size={28}/> : <RefreshCw size={25}/>}
             <div><h2>{order.status === 'created' && (uncertain || order.payment_submitted) ? 'Confirmando a situação do pagamento' : paymentLabels[order.status]}</h2>
-            <p>{order.fulfillment === 'review_required' ? 'A equipe precisa conferir este pedido. Fale com o atendimento.' : order.status === 'approved' ? order.mode === 'test' ? 'Teste confirmado. Nenhum acesso real foi liberado.' : 'Recebemos a confirmação do Mercado Pago. A equipe vai orientar a ativação pelo contato informado.' : 'A confirmação será atualizada aqui. Não faça um novo pagamento enquanto este pedido estiver em análise.'}</p></div>
+            <p>{order.fulfillment === 'review_required' ? 'A equipe precisa conferir este pedido. Fale com o atendimento.' : order.status === 'approved' ? order.mode === 'test' ? 'Teste confirmado. Nenhum acesso real foi liberado.' : 'Recebemos a confirmação do Mercado Pago. A equipe vai orientar a ativação pelo contato informado.' : ['rejected','cancelled'].includes(order.status) ? 'Este pagamento não foi concluído. Você pode iniciar outro pedido abaixo.' : 'A confirmação será atualizada aqui. Não faça um novo pagamento enquanto este pedido estiver em análise.'}</p></div>
           </div>}
-          {config?.publicKey && !uncertain && (!order.payment_submitted || order.payment_id) && <div className="mp-brick"><MercadoPagoCheckout amount={amount / 100} email={customer.email || undefined} paymentId={order.payment_id} onSubmit={submit} onError={() => setError('Não foi possível carregar o ambiente do Mercado Pago. Atualize o status ou fale com o atendimento.')}/></div>}
+          {config?.publicKey && !uncertain && !order.payment_submitted && !order.provider_order_id && order.status === 'created' && <div className="mp-brick"><MercadoPagoCheckout amount={amount / 100} email={customer.email || undefined} busy={busy} onSubmit={submit} onError={() => setError('Não foi possível carregar o ambiente do Mercado Pago. Atualize o status ou fale com o atendimento.')}/></div>}
+          {['pending','in_process','created'].includes(order.status) && <PaymentInstructions instructions={order.payment_instructions}/>}
           <button className="mp-refresh" disabled={busy} onClick={async () => {setBusy(true); setError(''); try {await refresh(order.id);} catch(e) {setError(e instanceof Error ? e.message : 'Tente novamente.');} finally {setBusy(false);}}}><RefreshCw size={16}/>{busy ? 'Consultando…' : 'Atualizar status do pedido'}</button>
           {(['rejected','cancelled'].includes(order.status) || (!order.payment_submitted && !order.payment_id && !uncertain && !busy)) && <a className="ap-trial-alternative" href={'/comprar?plano=' + order.plan_id}>Iniciar outro pedido</a>}
           <a className="ap-trial-alternative" href={customerSupportUrl} target="_blank" rel="noopener noreferrer">Preciso de ajuda com este pedido</a>

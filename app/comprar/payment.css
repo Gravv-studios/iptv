@@ -29,6 +29,24 @@
 .mp-result.approved svg{color:var(--ap-green)}
 .mp-refresh{display:flex;gap:9px;align-items:center;border:1px solid var(--ap-line);background:var(--ap-surface);color:var(--ap-text);border-radius:10px;padding:13px 15px;cursor:pointer;font-size:13px;margin:20px 0}
 .mp-brick{min-width:0;margin-top:20px}
+.mp-transparent h2,.mp-instructions h2{font-size:20px;margin-bottom:18px}
+.mp-choice{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.mp-choice label{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--ap-line);background:var(--ap-surface);padding:14px 8px;border-radius:10px;font-size:13px;cursor:pointer}
+.mp-choice input{position:absolute;opacity:0;width:1px;height:1px}
+.mp-choice label:focus-within{outline:2px solid var(--ap-yellow);outline-offset:2px}
+.mp-choice .selected{border-color:var(--ap-green);background:#10231a;color:var(--ap-green)}
+.mp-payer{margin-top:20px}
+.mp-customer select{min-height:50px;width:100%;border:1px solid var(--ap-line);border-radius:10px;padding:12px;background:var(--ap-surface);color:var(--ap-text);font:inherit;font-size:16px}
+.mp-billing-address{margin-top:24px}
+.mp-billing-address h3{font-size:16px;margin-bottom:16px}
+.mp-instructions{background:var(--ap-surface);border:1px solid var(--ap-line);border-radius:14px;padding:22px;margin:22px 0}
+.mp-instructions p{font-size:13px;line-height:1.8;color:var(--ap-muted)}
+.mp-qr{display:block;width:min(240px,100%);height:auto;background:#fff;padding:8px;border-radius:10px;margin:22px auto}
+.mp-code-label{display:grid;gap:8px;font-size:13px;margin:18px 0}
+.mp-code-label textarea{resize:vertical;width:100%;min-height:85px;overflow-wrap:anywhere;padding:12px;color:var(--ap-text);background:#090a0d;border:1px solid var(--ap-line);border-radius:8px;font-size:12px}
+.mp-instructions .ap-button{width:100%;font-size:14px}
+.mp-instructions .ap-trial-alternative{display:flex;align-items:center;gap:8px}
+.mp-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .mp-order-flow>.ap-trial-alternative{margin-right:20px}
 .ap-public .ap-order-card{position:sticky;top:90px}
 @media(max-width:760px){.ap-public .ap-order-card{position:static}.mp-methods{grid-template-columns:1fr}.mp-steps{gap:12px;font-size:11px}.mp-customer{margin-top:26px}.mp-result{padding:16px}}

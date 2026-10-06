@@ -4,7 +4,7 @@ Site de vendas e área do cliente para demonstrar a contratação, entrega e ren
 
 ## Publicação na Vercel — 06/10/2026
 
-Atualização de pagamentos: o checkout agora foi construído para receber no site por Mercado Pago (Pix, cartões e boleto), com pedidos persistentes em PostgreSQL, idempotência e confirmação por webhook assinado/consulta ao provedor. A conta de recebimento ainda será criada; credenciais e banco não estão configurados. A página mostra **Pagamento online em ativação**, sem criar cobranças. Ver [PAGAMENTOS.md](PAGAMENTOS.md) para configuração, testes e limites. A liberação do IPTV segue pendente de integração e, após o pagamento, depende da equipe. A descrição a seguir registra a publicação anterior ao checkout.
+Atualização de pagamentos: checkout transparente pela API de Orders do Mercado Pago, com Pix, cartão tokenizado e boleto, pedidos em PostgreSQL, idempotência e confirmação por webhook assinado/consulta ao provedor. A aplicação Aperte Play e o banco Neon gratuito em São Paulo já foram criados; a ativação depende de concluir credenciais, schema e homologação. A página mostra **Pagamento online em ativação**, sem criar cobranças. Ver [PAGAMENTOS.md](PAGAMENTOS.md) para o estado atual, configuração e limites. A liberação do IPTV segue pendente de integração e, após o pagamento, depende da equipe. A descrição a seguir registra a publicação anterior ao checkout.
 
 Marcos escolheu a Vercel para publicar este repositório. `vercel.json` fixa o framework Next.js, o comando `npm run build:vercel` e a saída `.next-vercel`. O build anterior do Vinext produzia um Worker da Cloudflare; publicá-lo como arquivos estáticos causava 404 mesmo com o deployment marcado como Ready.
 

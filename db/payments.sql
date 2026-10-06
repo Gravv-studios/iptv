@@ -13,12 +13,18 @@ CREATE TABLE IF NOT EXISTS aperte_sales_orders (
   mode text NOT NULL CHECK (mode IN ('test','production')),
   status text NOT NULL DEFAULT 'created' CHECK (status IN ('created','pending','in_process','authorized','approved','rejected','cancelled','refunded','charged_back','in_mediation')),
   payment_id text UNIQUE,
+  provider_order_id text UNIQUE,
+  payment_instructions jsonb,
   submission_hash text,
   provider_updated_at timestamptz,
   fulfillment text NOT NULL DEFAULT 'awaiting_payment' CHECK (fulfillment IN ('awaiting_payment','awaiting_activation','review_required')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+-- Additive migration from the unactivated Payments API draft; retains any local orders.
+ALTER TABLE aperte_sales_orders ADD COLUMN IF NOT EXISTS provider_order_id text;
+ALTER TABLE aperte_sales_orders ADD COLUMN IF NOT EXISTS payment_instructions jsonb;
+CREATE UNIQUE INDEX IF NOT EXISTS aperte_sales_provider_order ON aperte_sales_orders (provider_order_id) WHERE provider_order_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS aperte_sales_session_created ON aperte_sales_orders (session_hash, created_at DESC);
 CREATE INDEX IF NOT EXISTS aperte_sales_pending_activation ON aperte_sales_orders (fulfillment, updated_at DESC);
 -- The backend uses a private connection. Public/anonymous roles get no table access.

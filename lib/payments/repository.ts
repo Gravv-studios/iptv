@@ -2,7 +2,8 @@ import postgres from 'postgres';
 import {randomUUID} from 'node:crypto';
 import {CheckoutError} from './config';
 import {getPlan} from '../domain';
-import type {SalesOrder, PaymentStatus} from './types';
+import type {SalesOrder} from './types';
+import type {VerifiedOrder} from './validation';
 
 let connection: ReturnType<typeof postgres> | undefined;
 function sql() {
@@ -38,17 +39,39 @@ export async function findOrder(id: string, owner?: string) {
 }
 export async function reserveSubmission(id: string, fingerprint: string) {
   const rows = await sql()`UPDATE aperte_sales_orders SET submission_hash=${fingerprint},updated_at=now()
-    WHERE id=${id} AND payment_id IS NULL AND (submission_hash IS NULL OR submission_hash=${fingerprint}) AND status='created'
+    WHERE id=${id} AND provider_order_id IS NULL AND payment_id IS NULL AND submission_hash IS NULL AND status='created'
     AND created_at > now()-interval '24 hours' RETURNING *`;
   if (!rows[0]) throw new CheckoutError('PAYMENT_ALREADY_SUBMITTED', 409, 'Este pedido já foi enviado ou expirou. Consulte o status antes de tentar outro pagamento.');
   return rows[0] as SalesOrder;
 }
-export async function applyPayment(order: SalesOrder, payment: {id: string; status: PaymentStatus; updatedAt: string; refund: boolean}) {
+export function canApplyPayment(order: SalesOrder, payment: VerifiedOrder) {
+  if (order.provider_order_id && order.provider_order_id !== payment.providerId) return false;
+  if (order.payment_id && order.payment_id !== payment.id) return false;
+  const prior = order.provider_updated_at ? new Date(order.provider_updated_at).getTime() : 0;
+  const next = Date.parse(payment.updatedAt);
+  if (next < prior) return false;
+  if (['refunded','charged_back'].includes(order.status) && !['refunded','charged_back'].includes(payment.status)) return false;
+  if (order.status === 'approved' && !['approved','refunded','charged_back','in_mediation'].includes(payment.status)) return false;
+  if (order.status === 'in_mediation' && ['created','pending','in_process','authorized'].includes(payment.status)) return false;
+  // Equal-timestamp webhook deliveries may repeat, but cannot undo a terminal state.
+  if (next === prior && ['rejected','cancelled'].includes(order.status) && !['rejected','cancelled','approved','refunded','charged_back','in_mediation'].includes(payment.status)) return false;
+  return true;
+}
+export async function applyPayment(order: SalesOrder, payment: VerifiedOrder) {
   const fulfillment = payment.refund || ['refunded','charged_back','in_mediation'].includes(payment.status) ? 'review_required' : payment.status === 'approved' ? 'awaiting_activation' : 'awaiting_payment';
-  const rows = await sql()`UPDATE aperte_sales_orders SET payment_id=${payment.id},status=${payment.status},fulfillment=${fulfillment},provider_updated_at=${payment.updatedAt},updated_at=now()
-    WHERE id=${order.id} AND (payment_id IS NULL OR payment_id=${payment.id})
-      AND (provider_updated_at IS NULL OR provider_updated_at <= ${payment.updatedAt}::timestamptz)
-      AND NOT (status IN ('refunded','charged_back') AND ${payment.status} NOT IN ('refunded','charged_back'))
-    RETURNING *`;
-  return rows[0] as SalesOrder | undefined ?? await findOrder(order.id);
+  return sql().begin(async tx => {
+    const existing = await tx`SELECT * FROM aperte_sales_orders WHERE id=${order.id} FOR UPDATE`;
+    const current = existing[0] as SalesOrder | undefined;
+    if (!current || !canApplyPayment(current, payment)) return current;
+    const finalFulfillment = current.fulfillment === 'review_required' ? 'review_required' : fulfillment;
+    const encoded = payment.instructions ? JSON.stringify(payment.instructions) : null;
+    const rows = await tx`UPDATE aperte_sales_orders SET provider_order_id=${payment.providerId},payment_id=${payment.id},status=${payment.status},fulfillment=${finalFulfillment},payment_instructions=${encoded}::jsonb,provider_updated_at=${payment.updatedAt},updated_at=now()
+      WHERE id=${order.id} RETURNING *`;
+    return rows[0] as SalesOrder;
+  }) as Promise<SalesOrder | undefined>;
+}
+export async function rejectInvalidSubmission(id: string, fingerprint: string) {
+  const rows = await sql()`UPDATE aperte_sales_orders SET status='rejected',updated_at=now()
+    WHERE id=${id} AND submission_hash=${fingerprint} AND provider_order_id IS NULL AND status='created' RETURNING *`;
+  return rows[0] as SalesOrder | undefined ?? await findOrder(id);
 }
