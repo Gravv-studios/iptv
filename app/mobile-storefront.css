@@ -230,7 +230,14 @@
  .ap-mobile-dock .ap-button{font-size:14px;gap:6px}
 }
 
-/* Preserve the complete square logo on every screen size. */
-.ap-header .brand-logo{width:80px}
-.ap-header .brand-logo img{height:80px}
-.ap-footer .brand-logo{width:120px}
+/* Give the supplied artwork a seamless dark surface and balanced clear space. */
+.ap-header{background:#090a0d;backdrop-filter:none}
+.ap-header-inner{min-height:96px}
+.ap-header .brand-logo{width:88px;padding:4px 0}
+.ap-header .brand-logo img{height:88px;max-height:none}
+.ap-footer .brand-logo{width:132px}
+@media(min-width:760px){
+ .ap-header-inner{min-height:104px}
+ .ap-header .brand-logo{width:96px}
+ .ap-header .brand-logo img{height:96px}
+}
