@@ -1,5 +1,5 @@
 // Commercial offer supplied by the client on 03/10/2026.
-export const trialHours = 6;
+export const trialHours = 5;
 export const whatsappNumber = '5533984622431';
 export const whatsappDisplay = '(33) 98462-2431';
 export const trialMessage = `Olá! Quero solicitar o teste grátis de ${trialHours} horas da Aperte Play. Pode me orientar para configurar no meu aparelho?`;

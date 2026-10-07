@@ -34,7 +34,7 @@ const screens = [
 const planMonths: Record<string, number> = {mensal: 1, semestral: 6, anual: 12};
 
 const faqs = [
-  {q: 'Como recebo minhas 6 horas grátis?', a: 'Escolha seu aparelho, se quiser, e toque no botão de teste. O WhatsApp abre com a mensagem pronta. Envie para a equipe, que vai orientar a configuração e confirmar a ativação do seu acesso.'},
+  {q: 'Como recebo minhas 5 horas grátis?', a: 'Escolha seu aparelho, se quiser, e toque no botão de teste. O WhatsApp abre com a mensagem pronta. Envie para a equipe, que vai orientar a configuração e confirmar a ativação do seu acesso.'},
   {q: 'Preciso cadastrar um cartão?', a: 'Não. O teste é gratuito, sem cartão e sem cobrança automática. Você só paga se decidir contratar um plano depois.'},
   {q: 'Vai funcionar no meu aparelho?', a: 'Conte à equipe qual é o modelo da sua TV, celular, tablet ou computador. Ela confirma a compatibilidade e o aplicativo indicado antes de ativar seu teste. Escolher um aparelho aqui não garante compatibilidade.'},
   {q: 'O que acontece quando o teste acaba?', a: 'Você decide se quer continuar. Escolha o mensal por R$ 25, o semestral por R$ 100 ou o anual por R$ 170. O teste não se transforma em assinatura automaticamente.'},
@@ -65,7 +65,7 @@ export default function Storefront() {
 
   return (
     <div className="ap-site" ref={pageRef}>
-      <div className="ap-demo">{isVercelHosted ? <>6 horas grátis para experimentar <span>·</span> Atendimento pelo WhatsApp</> : <>Prévia do site <span>·</span> Compras em demonstração, sem cobrança real.</>}</div>
+      <div className="ap-demo">{isVercelHosted ? <>5 horas grátis para experimentar <span>·</span> Atendimento pelo WhatsApp</> : <>Prévia do site <span>·</span> Compras em demonstração, sem cobrança real.</>}</div>
       <header className="ap-header">
         <div className="ap-container ap-header-inner">
           <BrandLogo/>

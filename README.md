@@ -8,7 +8,7 @@ Atualização de pagamentos: checkout transparente pela API de Orders do Mercado
 
 Marcos escolheu a Vercel para publicar este repositório. `vercel.json` fixa o framework Next.js, o comando `npm run build:vercel` e a saída `.next-vercel`. O build anterior do Vinext produzia um Worker da Cloudflare; publicá-lo como arquivos estáticos causava 404 mesmo com o deployment marcado como Ready.
 
-A página inicial mantém a identidade aprovada, as 6 horas grátis e a tabela comercial. Na Vercel, `/comprar` apresenta o plano e abre o WhatsApp com preço total e período; `/area-do-cliente` oferece atendimento e informa que o portal com login está em preparação. Nenhuma mensagem é enviada automaticamente. Não há pagamento, acesso IPTV, autenticação de cliente ou banco de clientes reais configurados nesta publicação.
+A página inicial mantém a identidade aprovada, as 5 horas grátis e a tabela comercial. Na Vercel, `/comprar` apresenta o plano e abre o WhatsApp com preço total e período; `/area-do-cliente` oferece atendimento e informa que o portal com login está em preparação. Nenhuma mensagem é enviada automaticamente. Não há pagamento, acesso IPTV, autenticação de cliente ou banco de clientes reais configurados nesta publicação.
 
 Os headers de identidade do Sites não são aceitos como autenticação em requisições públicas da Vercel. O acesso ao D1 permanece exclusivo da demonstração local/Sites; a publicação não utiliza banco compartilhado em memória nem exibe uma conta fictícia como se fosse do visitante. O endpoint real de cobrança continua bloqueado com 503. A API de demonstração permite somente a prévia fictícia não autenticada e rejeita gravações.
 
@@ -52,11 +52,11 @@ Conferidos no navegador: página inicial, planos, compra e área do cliente, inc
 
 Tabela enviada pelo usuário: mensal **R$ 25 por 1 mês**, semestral **R$ 100 por 6 meses** e anual **R$ 170 por 12 meses**. O trimestral saiu do catálogo; pedidos anteriores permanecem legíveis, com valores e períodos originais. O anual recebe o destaque visual de maior economia. O checkout, as renovações e a área do cliente usam a mesma fonte de preços.
 
-A primeira seção oferece **6 horas grátis**, conforme o pedido explícito do usuário. O botão abre `https://wa.me/5533984622431` com uma mensagem preenchida para o visitante enviar. O número **(33) 98462-2431** veio da arte anexada. O site não envia mensagens automaticamente, não libera teste ao clicar e não inicia um cronômetro fictício. O atendimento confirma aparelho, configuração e ativação. A liberação automática depende de validar e conectar a API do fornecedor.
+A primeira seção oferece **5 horas grátis**, conforme o pedido explícito do usuário. O botão abre `https://wa.me/5533984622431` com uma mensagem preenchida para o visitante enviar. O número **(33) 98462-2431** veio da arte anexada. O site não envia mensagens automaticamente, não libera teste ao clicar e não inicia um cronômetro fictício. O atendimento confirma aparelho, configuração e ativação. A liberação automática depende de validar e conectar a API do fornecedor.
 
 A demonstração existente trabalha em dias: mensal 30, semestral 180 e anual 365. Antes de conectar um fornecedor real, validar os IDs de pacote e a regra de vencimento (dias ou meses de calendário) e usar a validade confirmada por ele. A oferta pública exibe os períodos em meses conforme a tabela recebida.
 
-`node scripts/test-commercial-offer.mjs` confere os preços, o plano retirado, a preservação de pedidos antigos e a solicitação de 6 horas sem alterar a conta de apresentação. O teste de integração completo em `scripts/test-demo.mjs` foi atualizado para a nova tabela; ele reinicializa a conta de demonstração e deve ser usado somente quando se desejar esse reset.
+`node scripts/test-commercial-offer.mjs` confere os preços, o plano retirado, a preservação de pedidos antigos e a solicitação de 5 horas sem alterar a conta de apresentação. O teste de integração completo em `scripts/test-demo.mjs` foi atualizado para a nova tabela; ele reinicializa a conta de demonstração e deve ser usado somente quando se desejar esse reset.
 
 ## Direção atual — 02/10/2026
 
@@ -101,7 +101,7 @@ O ambiente portátil oferece entrada de teste em `/signin-with-chatgpt?return_to
 - `app/api/demo/route.ts`: leitura e ações autenticadas, com origem validada.
 - `lib/store.ts`: consultas preparadas, persistência D1 e operações atômicas.
 - `lib/domain.ts`: catálogo comercial, compatibilidade de pedidos anteriores, cálculos e respostas do atendimento.
-- `lib/offer.ts`: teste grátis de 6 horas e contato comercial por WhatsApp.
+- `lib/offer.ts`: teste grátis de 5 horas e contato comercial por WhatsApp.
 - `db/schema.ts` e `drizzle/`: esquema e migração persistente.
 
 Os registros são vinculados ao identificador autenticado da plataforma. O cliente nunca determina o preço da cobrança. Pedido e confirmação têm proteção contra repetição; a renovação usa a maior data entre a validade atual e a confirmação. A marcação de pagamento e a extensão da assinatura ocorrem na mesma transação D1, exclusivamente no domínio de demonstração.

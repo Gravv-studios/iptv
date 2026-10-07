@@ -15,7 +15,7 @@
 .ap-demo{background:#15171d;color:#b9bfcb;text-align:center;font-size:12px;line-height:1.5;padding:6px 12px}
 .ap-demo>span{padding:0 5px}
 .ap-header{position:sticky;top:0;z-index:30;background:#090a0dd9;backdrop-filter:blur(14px);border-bottom:1px solid #ffffff0f}
-.ap-header-inner{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.ap-header-inner{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .ap-header .brand-logo{width:165px}
 .ap-header nav{display:none}
 .ap-header-actions{display:flex;align-items:center;gap:14px}
@@ -229,3 +229,8 @@
  .ap-mobile-dock{grid-template-columns:46px minmax(0,1fr) 46px;gap:6px;padding-left:8px;padding-right:8px}
  .ap-mobile-dock .ap-button{font-size:14px;gap:6px}
 }
+
+/* Preserve the complete square logo on every screen size. */
+.ap-header .brand-logo{width:80px}
+.ap-header .brand-logo img{height:80px}
+.ap-footer .brand-logo{width:120px}

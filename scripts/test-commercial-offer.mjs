@@ -31,14 +31,14 @@ assert.equal(domain.orderPlan({plan_id:'mensal',amount:2500,days:28}).period,'28
 const url=new URL(offer.trialUrl);
 assert.equal(url.hostname,'wa.me');
 assert.equal(url.pathname,'/5533984622431');
-assert.equal(offer.trialHours,6);
-assert.match(url.searchParams.get('text'),/teste grátis de 6 horas/);
-assert.match(domain.assistantReply('Quero testar grátis',domain.preview().account),/6 horas/);
+assert.equal(offer.trialHours,5);
+assert.match(url.searchParams.get('text'),/teste grátis de 5 horas/);
+assert.match(domain.assistantReply('Quero testar grátis',domain.preview().account),/5 horas/);
 assert.equal(offer.trialUrlForDevice(null),offer.trialUrl,'Choosing a device is optional.');
 for (const [device, text] of [['tv','na minha Smart TV'],['mobile','no meu celular ou tablet'],['computer','no meu computador']]) {
   const request = new URL(offer.trialUrlForDevice(device));
   assert.equal(request.origin + request.pathname,'https://wa.me/5533984622431','Device choice keeps the approved contact.');
   assert.ok(request.searchParams.get('text').includes(text),'The request includes the selected device.');
-  assert.match(request.searchParams.get('text'),/teste grátis de 6 horas/,'The offer stays unchanged.');
+  assert.match(request.searchParams.get('text'),/teste grátis de 5 horas/,'The offer stays unchanged.');
 }
-console.log('24 checks passed: prices, history, six-hour trial and optional device-specific WhatsApp messages. No account data changed.');
+console.log('24 checks passed: prices, history, five-hour trial and optional device-specific WhatsApp messages. No account data changed.');

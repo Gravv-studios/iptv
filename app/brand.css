@@ -16,7 +16,7 @@
   max-width: 100%;
   line-height: 1;
 }
-.brand-logo img { display: block; width: 100%; height: auto; }
+.brand-logo img { display: block; width: 100%; height: auto; max-height: 120px; object-fit: contain; }
 .sidebar .brand-logo { width: 206px; padding: 0; }
 .sidebar { background: #081a11; }
 .nav-item.selected { background: #173b26; color: #f8d447; }

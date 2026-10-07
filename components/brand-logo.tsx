@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
 export function BrandImage() {
-  // Hand-drawn vector logo; the earlier PNG artwork stays in public/images for reference.
+  // Original artwork supplied and approved by the client.
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src="/images/aperte-play-logo.svg" alt="Aperte Play" width={1076} height={112} />;
+  return <img src="/images/aperte-play-logo-cliente.png" alt="Aperte Play" width={640} height={640} />;
 }
 
 export function BrandLogo() {

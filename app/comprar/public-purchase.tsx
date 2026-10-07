@@ -142,7 +142,7 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
         <div className="mp-methods"><span><QrCode size={22}/><strong>Pix</strong><small>QR Code e copia e cola</small></span><span><CreditCard size={22}/><strong>Cartões</strong><small>Meios disponíveis na conta</small></span><span><ReceiptText size={22}/><strong>Boleto</strong><small>Após compensação</small></span></div>
         <ul><li><Check size={18}/>Pagamento processado pelo Mercado Pago</li><li><Check size={18}/>Confirmação acompanhada no site</li><li><Check size={18}/>Sem renovação automática</li></ul>
         <p className="ap-service-fine">A ativação é feita pela equipe após a confirmação do pagamento, pelo contato informado no pedido.</p>
-        <a className="ap-trial-alternative" href={trialUrl} target="_blank" rel="noopener noreferrer">Prefiro testar 6 horas grátis primeiro</a>
+        <a className="ap-trial-alternative" href={trialUrl} target="_blank" rel="noopener noreferrer">Prefiro testar 5 horas grátis primeiro</a>
       </aside>
     </main>
     <footer className="ap-service-footer ap-container">Aperte Play · Seu momento começa com um play.</footer>

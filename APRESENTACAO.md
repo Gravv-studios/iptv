@@ -10,7 +10,7 @@ Com a prévia local em execução, abra `http://127.0.0.1:5173/area-do-cliente` 
 
 Para apresentar em duas janelas, deixe o site em `http://127.0.0.1:5173/` e o painel em `http://127.0.0.1:5174/`. Inicie o segundo com `npm run dev:panel` enquanto o site estiver rodando. Faça a compra de teste na janela do site e volte para o painel para ver o pedido atualizado.
 
-1. **Site de vendas:** em `http://127.0.0.1:5173/`, mostre a apresentação da Aperte Play, a oferta de 6 horas grátis na primeira seção, o botão para solicitar pelo WhatsApp e os planos mensal (R$ 25), semestral (R$ 100) e anual (R$ 170). O atendimento confirma a ativação do teste; clicar no botão não libera um acesso automaticamente.
+1. **Site de vendas:** em `http://127.0.0.1:5173/`, mostre a apresentação da Aperte Play, a oferta de 5 horas grátis na primeira seção, o botão para solicitar pelo WhatsApp e os planos mensal (R$ 25), semestral (R$ 100) e anual (R$ 170). O atendimento confirma a ativação do teste; clicar no botão não libera um acesso automaticamente.
 2. **Contratação e pagamento:** clique em **Escolher mensal**, **Escolher semestral** ou **Escolher anual**. Na página de compra, confira o resumo, selecione Pix ou cartão e clique em **Continuar para pagamento**. Clique em **Simular pagamento aprovado**. Nenhum dado bancário deve ser informado.
 3. **Entrega:** mostre o usuário, a senha e a validade na confirmação. Clique em **Acessar minha área do cliente**. O exemplo não conecta a nenhum servidor IPTV.
 4. **Instalação:** abra Como assistir e alterne entre Smart TV, celular e computador. Explique que os aplicativos e links serão definidos com o fornecedor.
