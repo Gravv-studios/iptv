@@ -13,10 +13,15 @@ export type SalesOrder = {
   created_at: string; updated_at: string;
 };
 export type PublicOrder = Pick<SalesOrder, 'id' | 'plan_id' | 'plan_name' | 'period' | 'amount_cents' | 'status' | 'payment_id' | 'provider_order_id' | 'payment_instructions' | 'mode' | 'fulfillment' | 'created_at'> & {payment_submitted: boolean};
+// Orders saved before 08/10/2026 hold the instructions as a JSON string inside the jsonb column.
+export function storedInstructions(value: unknown): PaymentInstructions | null {
+  if (typeof value === 'string') { try { value = JSON.parse(value); } catch { return null; } }
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as PaymentInstructions : null;
+}
 export function publicOrder(order: SalesOrder): PublicOrder {
   const {id, plan_id, plan_name, period, amount_cents, status, payment_id, mode, fulfillment, created_at} = order;
   return {id, plan_id, plan_name, period, amount_cents, status, payment_id, provider_order_id: order.provider_order_id ?? null,
-    payment_instructions: ['pending','in_process','created'].includes(status) ? order.payment_instructions ?? null : null,
+    payment_instructions: ['pending','in_process','created'].includes(status) ? storedInstructions(order.payment_instructions) : null,
     mode, fulfillment, created_at, payment_submitted: !!order.submission_hash};
 }
 export const paymentLabels: Record<PaymentStatus, string> = {

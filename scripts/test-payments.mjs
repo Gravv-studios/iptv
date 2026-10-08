@@ -16,7 +16,7 @@ async function compile(relative) {
   await mkdir(path.dirname(target), {recursive: true});
   await writeFile(target, ts.transpileModule(await readFile(path.join(root, relative), 'utf8'), {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true}}).outputText);
 }
-for (const file of await readdir(path.join(root, 'lib/payments'))) if (file.endsWith('.ts')) await compile('lib/payments/' + file);
+for (const dir of ['lib/payments','lib/whatsapp']) for (const file of await readdir(path.join(root, dir))) if (file.endsWith('.ts')) await compile(dir + '/' + file);
 for (const file of ['lib/domain.ts','lib/offer.ts','app/api/checkout/route.ts','app/api/checkout/pay/route.ts','app/api/payments/webhook/route.ts','app/api/checkout/orders/[id]/route.ts']) await compile(file);
 await compile('components/payment-instructions.tsx');
 const require = createRequire(path.join(output, 'tests.cjs'));
@@ -151,6 +151,8 @@ await check('public order never reveals identity, submission payload or ownershi
   for (const key of ['email','phone','customer_name','session_hash','request_key','submission_hash','payer','token']) assert.equal(key in result,false);
   assert.equal(result.payment_submitted,true);
   assert.equal(publicOrder({...order,status:'approved',payment_instructions:{kind:'pix',qrCode:'old'}}).payment_instructions,null);
+  assert.deepEqual(publicOrder({...order,status:'pending',payment_instructions:JSON.stringify({kind:'pix',qrCode:'000201PIX'})}).payment_instructions,{kind:'pix',qrCode:'000201PIX'});
+  assert.equal(publicOrder({...order,status:'pending',payment_instructions:'not json'}).payment_instructions,null);
 });
 await check('session tokens are random and accepted only in the HttpOnly cookie format', () => {
   const token = security.newSessionToken(); assert.match(token,/^[a-f0-9]{64}$/); assert.notEqual(token,security.newSessionToken());

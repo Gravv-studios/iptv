@@ -3,6 +3,8 @@ import {readJson, verifyNotification} from '../../../../lib/payments/security';
 import {findOrder} from '../../../../lib/payments/repository';
 import {getProviderOrder, persistVerifiedPayment} from '../../../../lib/payments/mercado-pago';
 import {failure, json} from '../../../../lib/payments/http';
+import {whatsappConfig} from '../../../../lib/whatsapp/config';
+import {fulfillAndNotify} from '../../../../lib/whatsapp/fulfill';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
@@ -14,7 +16,9 @@ export async function POST(request: Request) {
     if (!payment.external_reference || !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(payment.external_reference)) return json({received: true});
     const order = await findOrder(payment.external_reference);
     if (!order) return json({received: true});
-    await persistVerifiedPayment(order, payment);
+    const updated = await persistVerifiedPayment(order, payment);
+    // Orders started in the WhatsApp bot are activated and confirmed here; site orders are left as they were.
+    if (updated.status === 'approved' && whatsappConfig().ready) await fulfillAndNotify(updated);
     return json({received: true});
   } catch (error) { return failure(error); }
 }

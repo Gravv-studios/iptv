@@ -16,7 +16,8 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "payments:setup": "node scripts/setup-payments.mjs",
-    "test:payments": "node scripts/test-payments.mjs"
+    "test:payments": "node scripts/test-payments.mjs",
+    "test:whatsapp": "node scripts/test-whatsapp.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

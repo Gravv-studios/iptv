@@ -57,6 +57,20 @@ Falha ambígua após o envio fecha o formulário e mantém a consulta de status.
 
 Sem integração de IPTV, aprovação fica em `awaiting_activation`. Reembolsos, contestações e devoluções parciais ficam em `review_required`; o código não inicia devoluções nem cancela acessos. Eventos antigos não sobrescrevem um estado mais recente.
 
+## Robô do WhatsApp (teste, Pix e liberação)
+
+Código em `lib/whatsapp/` e `app/api/whatsapp/bot`. As regras do chatbot do BotBot chamam `POST /api/whatsapp/bot?k=<segredo>` (tipo "URL, Servidor Externo ou Webhook"). O site interpreta a mensagem:
+
+- `teste`: cria um teste de 5 horas pela API de Revenda do painel (um por número) e responde com o acesso.
+- `mensal`, `semestral` ou `anual`: cria o pedido e o Pix no Mercado Pago. A regra usa dois blocos de resposta, `&part=1` (orientação) e `&part=2` (somente o copia e cola).
+- `paguei`: consulta o Mercado Pago e, se aprovado, libera e confirma.
+
+O webhook do Mercado Pago libera o acesso dos pedidos iniciados pelo robô (troca de pacote e renovação, ou criação da conta para quem não fez teste) e envia a confirmação pelo BotBot. Pedidos feitos no checkout do site continuam em `awaiting_activation`. Falha depois de iniciada a liberação não é repetida, para não gastar créditos em dobro: fica registrada em `aperte_wa_orders.error` e o administrador é avisado.
+
+Variáveis somente no ambiente de publicação: `SIGMA_API_TOKEN`, `BOTBOT_APP_KEY`, `BOTBOT_AUTH_KEY`, `WHATSAPP_BOT_SECRET` (24 caracteres ou mais) e, opcionais, `WHATSAPP_ADMIN`, `SIGMA_API_URL`, `SIGMA_SERVER_NAME` e `SIGMA_PACKAGE_TRIAL|MENSAL|SEMESTRAL|ANUAL`. Sem elas o endpoint responde 401 e o webhook não altera nada. As tabelas `aperte_wa_contacts` e `aperte_wa_orders` são criadas no primeiro uso.
+
+`npm run test:whatsapp`: 18 verificações offline. A criação de teste, a conversão do teste em plano pago e o envio de mensagens ainda precisam de validação com as contas reais.
+
 ## Verificações locais
 
 `npm run test:payments`: 51 verificações offline com dados sintéticos, incluindo valores, ambiente/recebedor, assinatura, estados, sanitização, idempotência, erros e instruções de pagamento vencidas. Não substituem testes com banco e conta reais. `node scripts/test-commercial-offer.mjs` verifica preços e teste grátis. `npm run build:vercel` valida a compilação.

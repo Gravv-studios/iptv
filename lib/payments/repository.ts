@@ -11,7 +11,8 @@ function sql() {
   if (!url) throw new CheckoutError('PAYMENTS_NOT_CONFIGURED', 503, 'O pagamento online está em ativação.');
   return connection ??= postgres(url, {max: 3, prepare: false, connect_timeout: 5, idle_timeout: 20, ssl: ['localhost', '127.0.0.1'].includes(new URL(url).hostname) ? false : 'require'});
 }
-export type NewOrder = {requestKey: string; planId: string; customerName: string; email: string; phone: string};
+export const database = () => sql();
+export type NewOrder ={requestKey: string; planId: string; customerName: string; email: string; phone: string};
 export async function createOrder(input: NewOrder, owner: string, mode: 'test' | 'production') {
   const db = sql();
   return db.begin(async tx => {
@@ -64,8 +65,9 @@ export async function applyPayment(order: SalesOrder, payment: VerifiedOrder) {
     const current = existing[0] as SalesOrder | undefined;
     if (!current || !canApplyPayment(current, payment)) return current;
     const finalFulfillment = current.fulfillment === 'review_required' ? 'review_required' : fulfillment;
-    const encoded = payment.instructions ? JSON.stringify(payment.instructions) : null;
-    const rows = await tx`UPDATE aperte_sales_orders SET provider_order_id=${payment.providerId},payment_id=${payment.id},status=${payment.status},fulfillment=${finalFulfillment},payment_instructions=${encoded}::jsonb,provider_updated_at=${payment.updatedAt},updated_at=now()
+    // postgres.js serializes jsonb parameters itself; a pre-stringified value is stored as a JSON string.
+    const instructions = payment.instructions ? tx.json(payment.instructions) : null;
+    const rows = await tx`UPDATE aperte_sales_orders SET provider_order_id=${payment.providerId},payment_id=${payment.id},status=${payment.status},fulfillment=${finalFulfillment},payment_instructions=${instructions},provider_updated_at=${payment.updatedAt},updated_at=now()
       WHERE id=${order.id} RETURNING *`;
     return rows[0] as SalesOrder;
   }) as Promise<SalesOrder | undefined>;

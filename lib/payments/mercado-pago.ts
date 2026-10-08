@@ -53,6 +53,18 @@ export function paymentBody(order: SalesOrder, input: z.infer<typeof submissionI
     items: [{external_code: order.plan_id, title: order.plan_name, description: order.period, quantity: 1, unit_price: amount}],
   };
 }
+// Pix requested from the WhatsApp bot: no browser form, so the payer is only the order's own contact data.
+export function pixBody(order: SalesOrder): CreateOrderRequest {
+  const parts = order.customer_name.trim().split(/\s+/);
+  const amount = (order.amount_cents / 100).toFixed(2);
+  return {
+    type: 'online', processing_mode: 'automatic', total_amount: amount,
+    external_reference: order.id, description: `${order.plan_name} · ${order.period}`,
+    transactions: {payments: [{amount, payment_method: {id: 'pix', type: 'bank_transfer'}, expiration_time: 'PT30M'}]},
+    payer: {email: order.email, first_name: parts[0], ...(parts.length > 1 ? {last_name: parts.slice(1).join(' ')} : {})},
+    items: [{external_code: order.plan_id, title: order.plan_name, description: order.period, quantity: 1, unit_price: amount}],
+  };
+}
 export async function persistVerifiedPayment(order: SalesOrder, response: OrderResponse) {
   const validated = verifiedProviderOrder(order, response, await getVerifiedAccount());
   return await applyPayment(order, validated) ?? order;
