@@ -20,6 +20,8 @@ function schema() {
     ALTER TABLE aperte_wa_orders ENABLE ROW LEVEL SECURITY;
     ALTER TABLE aperte_wa_messages ENABLE ROW LEVEL SECURITY;`).catch(error => { ready = undefined; throw error; });
 }
+// Brazilian numbers typed without the country code get it added, matching the format BotBot sends to.
+export const senderFromPhone = (phone: string) => { const digits = phone.replace(/\D/g, ''); return digits.length <= 11 ? '55' + digits : digits; };
 export async function findContact(sender: string) {
   await schema();
   return (await database()`SELECT * FROM aperte_wa_contacts WHERE sender=${sender}`)[0] as Contact | undefined;

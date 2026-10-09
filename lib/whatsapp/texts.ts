@@ -10,6 +10,8 @@ function server(customer: SigmaCustomer) {
   try { return customer.m3u_url ? new URL(customer.m3u_url).origin : ''; } catch { return ''; }
 }
 const access = (customer: SigmaCustomer) => `✅ *Usuário:* ${customer.username}\n✅ *Senha:* ${customer.password ?? 'a mesma de antes'}\n⏰ *Válido até:* ${when(customer.expires_at)}`;
+export type PublicAccess = {username: string; password: string | null; expiresAt: string; server: string};
+export const publicAccess = (customer: SigmaCustomer): PublicAccess => ({username: customer.username, password: customer.password, expiresAt: when(customer.expires_at), server: server(customer)});
 export const plansText = () => `Escolha o plano e responda com a palavra:\n\n${plans.map(p => `• *${p.id}* — ${money(p.amount)} (${p.period})`).join('\n')}\n\nO pagamento é por Pix, aqui mesmo na conversa.`;
 export function trialText(customer: SigmaCustomer) {
   const dns = server(customer);

@@ -9,6 +9,7 @@ import {getPlan, money, plans} from '../../lib/domain';
 import {trialUrl} from '../../lib/offer';
 import {customerSupportUrl} from '../../lib/sales';
 import {paymentLabels, type PublicOrder} from '../../lib/payments/types';
+import type {PublicAccess} from '../../lib/whatsapp/texts';
 import {PaymentInstructions} from '../../components/payment-instructions';
 import '../mobile-storefront.css';
 import '../public-service.css';
@@ -29,12 +30,13 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
   const [customer, setCustomer] = useState({customerName: '', email: '', phone: ''});
   const [busy, setBusy] = useState(false), [loading, setLoading] = useState(true), [error, setError] = useState('');
   const [uncertain, setUncertain] = useState(false);
+  const [access, setAccess] = useState<PublicAccess | null>(null), [activation, setActivation] = useState<string | null>(null);
   const requestKey = useRef(''), sending = useRef(false);
   const plan = getPlan(planId)!;
   const currentOrderId = order?.id, currentPaymentStatus = order?.status, paymentSubmitted = order?.payment_submitted;
   const refresh = useCallback(async (id: string) => {
-    const data = await requestJson<{order: PublicOrder}>('/api/checkout/orders/' + encodeURIComponent(id));
-    setOrder(data.order); setUncertain(false); return data.order as PublicOrder;
+    const data = await requestJson<{order: PublicOrder; access?: PublicAccess | null; activation?: string | null}>('/api/checkout/orders/' + encodeURIComponent(id));
+    setOrder(data.order); setAccess(data.access ?? null); setActivation(data.activation ?? null); setUncertain(false); return data.order as PublicOrder;
   }, []);
   useEffect(() => {
     requestKey.current = crypto.randomUUID();
@@ -56,6 +58,11 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
     })();
     return () => {active = false;};
   }, [refresh]);
+  useEffect(() => {
+    if (!currentOrderId || currentPaymentStatus !== 'approved' || access || activation !== 'busy') return;
+    const timer = setTimeout(() => void refresh(currentOrderId).catch(() => {}), 5000);
+    return () => clearTimeout(timer);
+  }, [currentOrderId, currentPaymentStatus, access, activation, refresh]);
   useEffect(() => {
     if (!currentOrderId || (!paymentSubmitted && !uncertain) || ['approved','rejected','cancelled','refunded','charged_back'].includes(currentPaymentStatus ?? '')) return;
     let count = 0;
@@ -126,7 +133,12 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
           {(step === 3 || uncertain) && <div className={'mp-result ' + (order.status === 'approved' ? 'approved' : '')} role="status">
             {order.status === 'approved' ? <CheckCircle2 size={28}/> : <RefreshCw size={25}/>}
             <div><h2>{order.status === 'created' && (uncertain || order.payment_submitted) ? 'Confirmando a situação do pagamento' : paymentLabels[order.status]}</h2>
-            <p>{order.fulfillment === 'review_required' ? 'A equipe precisa conferir este pedido. Fale com o atendimento.' : order.status === 'approved' ? order.mode === 'test' ? 'Teste confirmado. Nenhum acesso real foi liberado.' : 'Recebemos a confirmação do Mercado Pago. A equipe vai orientar a ativação pelo contato informado.' : ['rejected','cancelled'].includes(order.status) ? 'Este pagamento não foi concluído. Você pode iniciar outro pedido abaixo.' : 'A confirmação será atualizada aqui. Não faça um novo pagamento enquanto este pedido estiver em análise.'}</p></div>
+            <p>{order.fulfillment === 'review_required' ? 'A equipe precisa conferir este pedido. Fale com o atendimento.' : order.status === 'approved' ? order.mode === 'test' ? 'Teste confirmado. Nenhum acesso real foi liberado.' : access ? 'Pagamento confirmado e acesso liberado. Seus dados estão abaixo e também foram enviados para o WhatsApp informado.' : activation === 'busy' ? 'Pagamento confirmado. Estamos liberando seu acesso; os dados aparecem aqui em instantes.' : 'Recebemos a confirmação do Mercado Pago. A equipe vai orientar a ativação pelo contato informado.' : ['rejected','cancelled'].includes(order.status) ? 'Este pagamento não foi concluído. Você pode iniciar outro pedido abaixo.' : 'A confirmação será atualizada aqui. Não faça um novo pagamento enquanto este pedido estiver em análise.'}</p></div>
+          </div>}
+          {order.status === 'approved' && access && <div className="mp-access" role="status">
+            <h2>Seu acesso Aperte Play</h2>
+            <dl><div><dt>Usuário</dt><dd>{access.username}</dd></div><div><dt>Senha</dt><dd>{access.password ?? 'a mesma de antes'}</dd></div><div><dt>Válido até</dt><dd>{access.expiresAt}</dd></div>{access.server && <div><dt>Endereço (DNS/URL)</dt><dd>{access.server}</dd></div>}</dl>
+            <p>Instale LOTUS (código 2050), RX PURPLE (código 41494302) ou ZINK PLAYER na sua TV ou celular e entre com o usuário e a senha. Guarde estes dados.</p>
           </div>}
           {config?.publicKey && !uncertain && !order.payment_submitted && !order.provider_order_id && order.status === 'created' && <div className="mp-brick"><MercadoPagoCheckout amount={amount / 100} email={customer.email || undefined} busy={busy} onSubmit={submit} onError={() => setError('Não foi possível carregar o ambiente do Mercado Pago. Atualize o status ou fale com o atendimento.')}/></div>}
           {['pending','in_process','created'].includes(order.status) && <PaymentInstructions instructions={order.payment_instructions}/>}

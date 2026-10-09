@@ -250,4 +250,14 @@ await check('webhook answers go through the BotBot API once per message, with th
     });
   });
 });
+await check('a site order is tied to the WhatsApp typed in the form and shows only the access data', async () => {
+  assert.equal(store.senderFromPhone('(31) 99999-0000'), '5531999990000'); assert.equal(store.senderFromPhone('5531999990000'), '5531999990000'); assert.equal(store.senderFromPhone('3133334444'), '553133334444');
+  const shown = require('./lib/whatsapp/texts.js').publicAccess(paidCustomer);
+  assert.deepEqual(Object.keys(shown), ['username', 'password', 'expiresAt', 'server']); assert.equal(shown.server, 'http://server.invalid'); assert.doesNotMatch(JSON.stringify(shown), /get\.php|c1/);
+  await withFulfillment({store: {findLink: async () => ({...link, sender: '5531999990000'}), findContact: async () => undefined}}, async (calls, state) => {
+    const result = await fulfill.fulfillAndNotify(order);
+    assert.equal(result.state, 'activated'); assert.deepEqual(calls, ['create:m1', 'save']);
+    assert.equal(state.sent.length, 1); assert.equal(state.sent[0][0], '5531999990000'); assert.match(state.sent[0][1], /Pagamento confirmado[\s\S]*user1[\s\S]*pass1/);
+  });
+});
 console.log(`${total} WhatsApp checks passed. Offline fixtures only; no supplier, message or payment verification.`);

@@ -27,6 +27,12 @@
 .mp-result p{font-size:13px;color:var(--ap-muted);line-height:1.8}
 .mp-result.approved{border-color:#247348}
 .mp-result.approved svg{color:var(--ap-green)}
+.mp-access{background:var(--ap-surface);border:1px solid #247348;border-radius:14px;padding:20px;margin:20px 0}
+.mp-access h2{font-size:19px;margin-bottom:12px}
+.mp-access dl{display:grid;gap:10px;margin-bottom:14px}
+.mp-access dt{font-size:12px;color:var(--ap-muted)}
+.mp-access dd{font-size:17px;font-weight:700;word-break:break-all;user-select:all}
+.mp-access p{font-size:13px;color:var(--ap-muted);line-height:1.8}
 .mp-refresh{display:flex;gap:9px;align-items:center;border:1px solid var(--ap-line);background:var(--ap-surface);color:var(--ap-text);border-radius:10px;padding:13px 15px;cursor:pointer;font-size:13px;margin:20px 0}
 .mp-brick{min-width:0;margin-top:20px}
 .mp-transparent h2,.mp-instructions h2{font-size:20px;margin-bottom:18px}
