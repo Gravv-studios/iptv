@@ -14,7 +14,9 @@ export type Intent = {kind: 'plan'; plan: 'mensal' | 'semestral' | 'anual'} | {k
 // Body BotBot posts for a "URL, Servidor Externo ou Webhook" reply.
 export function parseMessage(body: unknown): BotMessage | null {
   const data = body && typeof body === 'object' && !Array.isArray(body) ? body as Record<string, unknown> : {};
-  const sender = String(data.senderPhone ?? '').replace(/[^\w@.:-]/g, '').slice(0, 60);
+  // Contacts hidden behind a WhatsApp LID may arrive without a phone; fall back to any other sender identifier.
+  const identifier = [data.senderPhone, data.senderLid, data.senderId, data.senderJid, data.sender, data.chatId, data.from].find(value => (typeof value === 'string' || typeof value === 'number') && String(value).trim());
+  const sender = String(identifier ?? '').replace(/[^\w@.:-]/g, '').slice(0, 60);
   const text = typeof data.senderMessage === 'string' ? data.senderMessage.slice(0, 400) : '';
   if (!sender || !text) return null;
   const name = typeof data.senderName === 'string' ? data.senderName.replace(/[\u0000-\u001f<>]/g, ' ').trim().slice(0, 60) : '';
