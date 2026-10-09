@@ -224,4 +224,30 @@ await check('supplier calls send the bearer token and surface only short error t
   await patch(globalThis, {fetch: async () => Response.json({message: 'Insufficient credits to perform the operation.'}, {status: 402})}, async () => assert.rejects(sigma.renewCustomer('c1'), error => error.status === 402 && /Insufficient credits/.test(error.message) && !/SYNTHETIC/.test(error.message)));
   await patch(globalThis, {fetch: async () => Response.json({data: {}})}, async () => assert.rejects(sigma.getCustomer('c1'), /resposta sem cliente/));
 });
+const hook = change => ({event: 'message', messageId: 'MSG-1', from: '553199990000', message: 'teste', messageType: 'text', timestamp: 1791496000, deviceName: 'Aperte Play', devicePhone: '553384622431', ...change});
+await check('device webhook answers only private text messages from a real number', () => {
+  assert.deepEqual(bot.parseHook(hook({})), {id: 'MSG-1', sender: '553199990000', name: 'Cliente WhatsApp', text: 'teste', at: 1791496000});
+  for (const change of [{event: 'message_sent'}, {messageType: 'image'}, {message: '  '}, {messageId: ''}, {from: '120363000000000000@g.us'}, {from: '184467440737095@lid'}, {from: '553384622431'}, {from: undefined}]) assert.equal(bot.parseHook(hook(change)), null);
+  assert.equal(bot.parseHook(null), null);
+});
+await check('webhook answers go through the BotBot API once per message, with the Pix code alone in its own message', async () => {
+  const sent = [];
+  let claims = 0;
+  await patch(botbot, {sendText: async (to, text) => { sent.push([to, text]); return true; }}, async () => {
+    await patch(store, {claimMessage: async () => ++claims === 1, latestOrder: async () => ({...pending, created_at: new Date().toISOString()})}, async () => {
+      assert.equal(await bot.answer({...bot.parseHook(hook({message: 'quero o mensal'}))}), true);
+      assert.equal(sent.length, 2); assert.equal(sent[0][0], '553199990000'); assert.match(sent[0][1], /Aperte Play Mensal/); assert.equal(sent[1][1], '000201SYNTHETICPIX');
+      assert.equal(await bot.answer({...bot.parseHook(hook({message: 'quero o mensal'}))}), false);
+      assert.equal(sent.length, 2);
+    });
+    await patch(store, {claimMessage: async () => { throw new Error('ordinary chat must not touch the database'); }}, async () => {
+      assert.equal(await bot.answer({...bot.parseHook(hook({message: 'boa noite, tudo bem?'}))}), false);
+      assert.equal(sent.length, 2);
+    });
+    await patch(store, {claimMessage: async () => true, findContact: async () => { throw new Error('database down'); }}, async () => {
+      await assert.rejects(bot.answer({...bot.parseHook(hook({message: 'teste'}))}), /database down/);
+      assert.equal(sent.length, 3); assert.match(sent[2][1], /indisponível/);
+    });
+  });
+});
 console.log(`${total} WhatsApp checks passed. Offline fixtures only; no supplier, message or payment verification.`);

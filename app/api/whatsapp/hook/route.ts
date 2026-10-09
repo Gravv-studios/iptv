@@ -1,21 +1,31 @@
+import {timingSafeEqual} from 'node:crypto';
+import {after} from 'next/server';
+import {CheckoutError} from '../../../../lib/payments/config';
 import {json} from '../../../../lib/payments/http';
-import {readJson} from '../../../../lib/payments/security';
+import {hash, readJson} from '../../../../lib/payments/security';
+import {answer, parseHook} from '../../../../lib/whatsapp/bot';
+import {whatsappConfig} from '../../../../lib/whatsapp/config';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-// Temporary: learns the structure of BotBot device webhooks. Logs field names, types and sizes, never the values.
-function shape(value: unknown, depth = 0): string {
-  if (Array.isArray(value)) return `[${value.length}${value.length && depth < 3 ? ' ' + shape(value[0], depth + 1) : ''}]`;
-  if (value && typeof value === 'object') {
-    return depth >= 3 ? '{…}' : `{${Object.entries(value as Record<string, unknown>).slice(0, 40).map(([name, item]) => `${name.slice(0, 30)}:${shape(item, depth + 1)}`).join(' ')}}`;
-  }
-  if (typeof value === 'string') {
-    const suffix = /@(lid|s\.whatsapp\.net|g\.us|c\.us)$/.exec(value)?.[0] ?? '';
-    return `s${value.length}${/^\d+$/.test(value) ? 'd' : ''}${suffix}`;
-  }
-  return value === null ? 'null' : typeof value;
-}
+export const maxDuration = 30;
+// BotBot device webhook: every incoming message, with the sender's number (the chatbot URL reply omits it).
+// The shared secret in the URL is the only caller authentication BotBot offers.
 export async function POST(request: Request) {
-  try { console.info('whatsapp_hook_shape', shape(await readJson(request, 60000)).slice(0, 3500)); }
-  catch { console.info('whatsapp_hook_shape', 'unreadable', request.headers.get('content-type') ?? ''); }
+  const config = whatsappConfig();
+  const key = new URL(request.url).searchParams.get('k') ?? '';
+  if (!config.ready || !config.canSend || !timingSafeEqual(Buffer.from(hash(key)), Buffer.from(hash(config.secret)))) return json({error: 'Não autorizado.'}, 401);
+  let body: unknown;
+  try { body = await readJson(request, 60000); } catch { return json({received: true}); }
+  const message = parseHook(body);
+  if (!message && body && typeof body === 'object') {
+    const data = body as Record<string, unknown>;
+    // Event and type names only, to learn which notifications BotBot sends.
+    console.info('whatsapp_hook_ignored', `event:${String(data.event).slice(0, 20)} type:${String(data.messageType).slice(0, 20)}`);
+  }
+  // Answer BotBot at once; it disables webhooks that fail or stall repeatedly.
+  if (message) after(async () => {
+    try { await answer(message); }
+    catch (error) { console.error('whatsapp_hook_failed', error instanceof CheckoutError ? error.code : error instanceof Error ? error.name : 'unknown'); }
+  });
   return json({received: true});
 }

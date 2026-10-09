@@ -4,10 +4,11 @@ import {createOrder, findOrder, reserveSubmission} from '../payments/repository'
 import {hash} from '../payments/security';
 import {storedInstructions, type SalesOrder} from '../payments/types';
 import {trialHours} from '../offer';
+import {sendText} from './botbot';
 import {fulfillOrder} from './fulfill';
 import {createCustomer, getCustomer, resolvePackages} from './sigma';
-import {claimNotice, findContact, latestOrder, linkOrder, releaseTrial, reserveTrial, saveCustomer} from './store';
-import {helpText, noOrderText, paidText, pendingText, pixIntroText, pixUnavailableText, plansText, reviewText, statusText, trialText} from './texts';
+import {claimMessage, claimNotice, findContact, latestOrder, linkOrder, releaseTrial, reserveTrial, saveCustomer} from './store';
+import {busyText, helpText, noOrderText, paidText, pendingText, pixIntroText, pixUnavailableText, plansText, reviewText, statusText, trialText} from './texts';
 
 export type BotMessage = {sender: string; name: string; text: string; at: number};
 export type Intent = {kind: 'plan'; plan: 'mensal' | 'semestral' | 'anual'} | {kind: 'paid' | 'pay' | 'trial' | 'help'};
@@ -23,11 +24,21 @@ export function parseMessage(body: unknown): BotMessage | null {
   const at = Number(data.messageDateTime);
   return {sender, name: name.length >= 3 ? name : 'Cliente WhatsApp', text, at: Number.isFinite(at) && at > 0 ? Math.floor(at) : Math.floor(Date.now() / 60000)};
 }
+// Body of a BotBot device webhook. Only text sent by a person in a private chat is answered.
+export function parseHook(body: unknown): (BotMessage & {id: string}) | null {
+  const data = body && typeof body === 'object' && !Array.isArray(body) ? body as Record<string, unknown> : {};
+  const sender = typeof data.from === 'string' ? data.from : '';
+  const id = typeof data.messageId === 'string' ? data.messageId.slice(0, 120) : '';
+  if (data.event !== 'message' || data.messageType !== 'text' || typeof data.message !== 'string' || !data.message.trim() || !id) return null;
+  if (!/^\d{10,15}$/.test(sender) || sender === String(data.devicePhone ?? '')) return null;
+  const at = Number(data.timestamp);
+  return {id, sender, name: 'Cliente WhatsApp', text: data.message.slice(0, 400), at: Number.isFinite(at) && at > 0 ? Math.floor(at) : Math.floor(Date.now() / 60000)};
+}
 export function intentOf(text: string): Intent {
   const words = text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const plan = (['semestral', 'anual', 'mensal'] as const).find(id => new RegExp(`\\b${id}\\b`).test(words));
   if (plan) return {kind: 'plan', plan};
-  if (/\b(paguei|pago|paga|status|comprovante)\b/.test(words)) return {kind: 'paid'};
+  if (/\b(paguei|comprovante)\b/.test(words)) return {kind: 'paid'};
   if (/\b(pagar|pix|assinar|renovar|comprar|plano|planos)\b/.test(words)) return {kind: 'pay'};
   if (/\bteste/.test(words)) return {kind: 'trial'};
   return {kind: 'help'};
@@ -94,4 +105,18 @@ export async function reply(message: BotMessage, part: string | null) {
   const code = pixCode(order);
   if (!code) return part === '2' ? '' : pixUnavailableText;
   return part === '1' ? pixIntroText(order) : part === '2' ? code : `${pixIntroText(order)}\n\n${code}`;
+}
+// Device-webhook path: the answer is pushed through the BotBot API. Ordinary conversation gets no automatic reply.
+export async function answer(message: BotMessage & {id: string}) {
+  const intent = intentOf(message.text);
+  if (intent.kind === 'help' || !(await claimMessage(message.id))) return false;
+  try {
+    if (!('plan' in intent)) return await sendText(message.sender, await reply(message, null));
+    await sendText(message.sender, await reply(message, '1'));
+    const code = await reply(message, '2');
+    return code ? await sendText(message.sender, code) : false;
+  } catch (error) {
+    await sendText(message.sender, busyText);
+    throw error;
+  }
 }

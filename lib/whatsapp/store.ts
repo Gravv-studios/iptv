@@ -14,9 +14,11 @@ function schema() {
       order_id uuid PRIMARY KEY, sender text NOT NULL, claimed_at timestamptz, activated_at timestamptz,
       notified_at timestamptz, error text, created_at timestamptz NOT NULL DEFAULT now());
     CREATE INDEX IF NOT EXISTS aperte_wa_orders_sender ON aperte_wa_orders (sender, created_at DESC);
-    REVOKE ALL ON aperte_wa_contacts, aperte_wa_orders FROM PUBLIC;
+    CREATE TABLE IF NOT EXISTS aperte_wa_messages (message_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
+    REVOKE ALL ON aperte_wa_contacts, aperte_wa_orders, aperte_wa_messages FROM PUBLIC;
     ALTER TABLE aperte_wa_contacts ENABLE ROW LEVEL SECURITY;
-    ALTER TABLE aperte_wa_orders ENABLE ROW LEVEL SECURITY;`).catch(error => { ready = undefined; throw error; });
+    ALTER TABLE aperte_wa_orders ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE aperte_wa_messages ENABLE ROW LEVEL SECURITY;`).catch(error => { ready = undefined; throw error; });
 }
 export async function findContact(sender: string) {
   await schema();
@@ -66,5 +68,11 @@ export async function markFailed(orderId: string, error: string) {
 }
 export async function claimNotice(orderId: string) {
   const rows = await database()`UPDATE aperte_wa_orders SET notified_at=now() WHERE order_id=${orderId} AND notified_at IS NULL AND activated_at IS NOT NULL RETURNING order_id`;
+  return rows.length === 1;
+}
+// BotBot may deliver the same webhook more than once; each message is answered a single time.
+export async function claimMessage(messageId: string) {
+  await schema();
+  const rows = await database()`INSERT INTO aperte_wa_messages (message_id) VALUES (${messageId}) ON CONFLICT (message_id) DO NOTHING RETURNING message_id`;
   return rows.length === 1;
 }
