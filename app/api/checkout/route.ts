@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const token = sessionToken(request) ?? newSessionToken();
     const order = await createOrder(parsed.data, sessionHash(token, config.sessionSecret), config.mode);
     // Lets the paid order be activated and the access sent to the WhatsApp typed in the form.
-    if (whatsappConfig().ready && order.mode === 'production') await linkOrder(order.id, senderFromPhone(order.phone)).catch(() => console.error('order_link_failed'));
+    if (whatsappConfig().ready && order.mode === 'production') await linkOrder(order.id, senderFromPhone(order.phone), 'site').catch(() => console.error('order_link_failed'));
     const secure = new URL(request.url).protocol === 'https:' || process.env.VERCEL === '1';
     return json({order: publicOrder(order)}, 200, {'Set-Cookie': `${sessionCookie}=${token}; HttpOnly; SameSite=Lax; Path=/api/checkout; Max-Age=2592000${secure ? '; Secure' : ''}`});
   } catch (error) { return failure(error); }

@@ -12,6 +12,6 @@ export async function GET(request: Request, {params}: {params: Promise<{id: stri
     const order = await reconcileOrder(await ownedOrder(request, (await params).id));
     // Only the browser session that created the order reaches this point, so it may see its own access.
     const result = order.status === 'approved' && order.mode === 'production' && whatsappConfig().ready ? await fulfillAndNotify(order) : null;
-    return json({order: publicOrder(order), access: result && 'customer' in result ? publicAccess(result.customer) : null, activation: result ? result.state : null});
+    return json({order: publicOrder(order), access: result && 'customer' in result && result.fresh ? publicAccess(result.customer) : null, activation: result ? result.state : null});
   } catch (error) { return failure(error); }
 }

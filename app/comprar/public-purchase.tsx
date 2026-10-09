@@ -59,9 +59,11 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
     return () => {active = false;};
   }, [refresh]);
   useEffect(() => {
-    if (!currentOrderId || currentPaymentStatus !== 'approved' || access || activation !== 'busy') return;
-    const timer = setTimeout(() => void refresh(currentOrderId).catch(() => {}), 5000);
-    return () => clearTimeout(timer);
+    // After approval the access is fetched from the order status; keep asking while the activation is under way.
+    if (!currentOrderId || currentPaymentStatus !== 'approved' || access || (activation !== 'busy' && activation !== null)) return;
+    let count = 0;
+    const timer = setInterval(() => { if (++count > 24) { clearInterval(timer); return; } void refresh(currentOrderId).catch(() => {}); }, activation === null ? 1500 : 5000);
+    return () => clearInterval(timer);
   }, [currentOrderId, currentPaymentStatus, access, activation, refresh]);
   useEffect(() => {
     if (!currentOrderId || (!paymentSubmitted && !uncertain) || ['approved','rejected','cancelled','refunded','charged_back'].includes(currentPaymentStatus ?? '')) return;

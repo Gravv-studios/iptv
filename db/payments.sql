@@ -30,3 +30,17 @@ CREATE INDEX IF NOT EXISTS aperte_sales_pending_activation ON aperte_sales_order
 -- The backend uses a private connection. Public/anonymous roles get no table access.
 REVOKE ALL ON aperte_sales_orders FROM PUBLIC;
 ALTER TABLE aperte_sales_orders ENABLE ROW LEVEL SECURITY;
+
+-- WhatsApp bot and automatic delivery (lib/whatsapp/store.ts creates the tables on first use).
+CREATE TABLE IF NOT EXISTS aperte_wa_contacts (
+  sender text PRIMARY KEY, sender_name text NOT NULL DEFAULT '', customer_id text,
+  trial_at timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS aperte_wa_orders (
+  order_id uuid PRIMARY KEY, sender text NOT NULL, origin text NOT NULL DEFAULT 'bot', customer_id text,
+  claimed_at timestamptz, activated_at timestamptz, notified_at timestamptz, error text, created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS aperte_wa_orders_sender ON aperte_wa_orders (sender, created_at DESC);
+CREATE TABLE IF NOT EXISTS aperte_wa_messages (message_id text PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now());
+REVOKE ALL ON aperte_wa_contacts, aperte_wa_orders, aperte_wa_messages FROM PUBLIC;
+ALTER TABLE aperte_wa_contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE aperte_wa_orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE aperte_wa_messages ENABLE ROW LEVEL SECURITY;

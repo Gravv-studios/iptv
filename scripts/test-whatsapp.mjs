@@ -50,7 +50,7 @@ const catalog = [
 ];
 const packages = sigma.pickPackages(catalog, 'PRIMELUX SERVER');
 const orderId = randomUUID();
-const order = {id: orderId, request_key: randomUUID(), session_hash: 'private-hash', plan_id: 'mensal', plan_name: 'Aperte Play Mensal', period: '1 mês', amount_cents: 2500, customer_name: 'Cliente Teste', email: 'cliente.abc@example.invalid', phone: '5531999990000', mode: 'test', status: 'approved', payment_id: 'PAY01JS2V6CM8KJ0EC4H504R7YE34', provider_order_id: 'ORD01JS2V6CM8KJ0EC4H502TGK1WP', payment_instructions: null, submission_hash: 'fingerprint', provider_updated_at: null, fulfillment: 'awaiting_activation', created_at: iso(-60000), updated_at: iso(0)};
+const order = {id: orderId, request_key: randomUUID(), session_hash: 'private-hash', plan_id: 'mensal', plan_name: 'Aperte Play Mensal', period: '1 mês', amount_cents: 2500, customer_name: 'Cliente Teste', email: 'cliente.abc@example.invalid', phone: '5531999990000', mode: 'production', status: 'approved', payment_id: 'PAY01JS2V6CM8KJ0EC4H504R7YE34', provider_order_id: 'ORD01JS2V6CM8KJ0EC4H502TGK1WP', payment_instructions: null, submission_hash: 'fingerprint', provider_updated_at: null, fulfillment: 'awaiting_activation', created_at: iso(-60000), updated_at: iso(0)};
 const trialCustomer = {id: 'c1', username: 'user1', password: 'pass1', expires_at: iso(5 * 3600000), status: 'ACTIVE', is_trial: 'YES', package: 'TESTE', package_id: 't1', m3u_url: 'http://server.invalid:80/get.php?username=user1'};
 const message = text => ({sender: '5531999990000', name: 'Cliente Teste', text, at: 1791496000});
 
@@ -197,10 +197,23 @@ await check('supplier failure after the claim stops for manual review and warns 
 });
 await check('repeated deliveries, unpaid orders and site orders never reach the supplier', async () => {
   const forbidden = {sigma: {getCustomer: async () => { throw new Error('supplier must not be called'); }, changePackage: async () => { throw new Error('supplier must not be called'); }, renewCustomer: async () => { throw new Error('supplier must not be called'); }, createCustomer: async () => { throw new Error('supplier must not be called'); }}};
-  await withFulfillment({...forbidden, store: {claimActivation: async () => false}}, async () => assert.equal((await fulfill.fulfillOrder(order)).state, 'busy'));
-  await withFulfillment({...forbidden, store: {claimActivation: async () => false, findLink: async () => ({...link, error: 'x'})}}, async () => assert.equal((await fulfill.fulfillOrder(order)).state, 'review'));
-  await withFulfillment({...forbidden, store: {findLink: async () => undefined}}, async () => assert.equal(await fulfill.fulfillOrder(order), null));
-  for (const change of [{status: 'pending'}, {status: 'refunded'}, {fulfillment: 'review_required'}]) await withFulfillment(forbidden, async () => assert.equal(await fulfill.fulfillOrder({...order, ...change}), null));
+  const writes = {sigma: {changePackage: forbidden.sigma.changePackage, renewCustomer: forbidden.sigma.renewCustomer, createCustomer: forbidden.sigma.createCustomer}};
+  await withFulfillment({...writes, store: {claimActivation: async () => false}}, async () => assert.equal((await fulfill.fulfillOrder(order)).state, 'busy'));
+  await withFulfillment({...forbidden, store: {findLink: async () => ({...link, claimed_at: new Date().toISOString()})}}, async () => assert.equal((await fulfill.fulfillOrder(order)).state, 'busy'));
+  await withFulfillment({...forbidden, store: {findLink: async () => ({...link, claimed_at: iso(0), error: 'x'})}}, async (_calls, state) => { assert.equal((await fulfill.fulfillOrder(order)).state, 'review'); assert.equal(state.admin.length, 0); });
+  for (const change of [{status: 'pending'}, {status: 'refunded'}, {fulfillment: 'review_required'}, {mode: 'test'}]) await withFulfillment(forbidden, async () => assert.equal(await fulfill.fulfillOrder({...order, ...change}), null));
+});
+await check('a claim abandoned by an interrupted run goes to review once, without calling the supplier again', async () => {
+  const forbidden = {sigma: {getCustomer: async () => { throw new Error('supplier must not be called'); }, changePackage: async () => { throw new Error('supplier must not be called'); }, renewCustomer: async () => { throw new Error('supplier must not be called'); }, createCustomer: async () => { throw new Error('supplier must not be called'); }}};
+  await withFulfillment({...forbidden, store: {findLink: async () => ({...link, claimed_at: new Date(Date.now() - 10 * 60000).toISOString()})}}, async (_calls, state) => {
+    assert.equal((await fulfill.fulfillOrder(order)).state, 'review'); assert.match(state.failed, /interrompida/); assert.equal(state.admin.length, 1);
+  });
+});
+await check('a package change that already moved the expiry is never followed by a second charge', async () => {
+  const before = {...paidCustomer, package_id: 'a1', expires_at: new Date(Date.now() + 10 * day).toISOString()};
+  await withFulfillment({sigma: {getCustomer: async () => before, changePackage: async () => ({...before, package_id: 'm1', expires_at: new Date(Date.now() + 30 * day).toISOString()}), renewCustomer: async () => { throw new Error('must not renew'); }}}, async (_calls, state) => {
+    assert.equal((await fulfill.fulfillOrder(order)).state, 'review'); assert.match(state.failed, /validade alterada/); assert.equal(state.activated, 0);
+  });
 });
 await check('the buyer is told once, and "paguei" answers from the authoritative provider status', async () => {
   await withFulfillment({}, async (_calls, state) => {
@@ -257,9 +270,10 @@ await check('a site order is tied to the WhatsApp typed in the form and shows on
   assert.equal(store.senderFromPhone('(31) 99999-0000'), '5531999990000'); assert.equal(store.senderFromPhone('5531999990000'), '5531999990000'); assert.equal(store.senderFromPhone('3133334444'), '553133334444');
   const shown = require('./lib/whatsapp/texts.js').publicAccess(paidCustomer);
   assert.deepEqual(Object.keys(shown), ['username', 'password', 'expiresAt', 'server']); assert.equal(shown.server, 'http://server.invalid'); assert.doesNotMatch(JSON.stringify(shown), /get\.php|c1/);
-  await withFulfillment({store: {findLink: async () => ({...link, sender: '5531999990000'}), findContact: async () => undefined}}, async (calls, state) => {
+  // Another customer already has this phone on file: the site order must not touch or reveal that account.
+  await withFulfillment({store: {findLink: async () => ({...link, sender: '5531999990000', origin: 'site'}), findContact: async () => { throw new Error('a site order must not look up accounts by phone'); }}, sigma: {getCustomer: async () => { throw new Error('must not read another account'); }}}, async (calls, state) => {
     const result = await fulfill.fulfillAndNotify(order);
-    assert.equal(result.state, 'activated'); assert.deepEqual(calls, ['create:m1', 'save']);
+    assert.equal(result.state, 'activated'); assert.equal(result.fresh, true); assert.deepEqual(calls, ['create:m1']);
     assert.equal(state.sent.length, 1); assert.equal(state.sent[0][0], '5531999990000'); assert.match(state.sent[0][1], /Pagamento confirmado[\s\S]*user1[\s\S]*pass1/);
   });
 });

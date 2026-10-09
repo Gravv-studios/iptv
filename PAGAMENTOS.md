@@ -65,11 +65,11 @@ Código em `lib/whatsapp/` e `app/api/whatsapp/`. O webhook do dispositivo no Bo
 - `mensal`, `semestral` ou `anual`: cria o pedido e o Pix no Mercado Pago e envia duas mensagens: a orientação e, sozinho, o copia e cola.
 - `paguei`: consulta o Mercado Pago e, se aprovado, libera e confirma.
 
-O webhook do Mercado Pago libera o acesso dos pedidos iniciados pelo robô (troca de pacote e renovação, ou criação da conta para quem não fez teste) e envia a confirmação pelo BotBot. Pedidos feitos no checkout do site continuam em `awaiting_activation`. Falha depois de iniciada a liberação não é repetida, para não gastar créditos em dobro: fica registrada em `aperte_wa_orders.error` e o administrador é avisado.
+O webhook do Mercado Pago libera o acesso dos pedidos iniciados pelo robô (troca de pacote e renovação, ou criação da conta para quem não fez teste) e envia a confirmação pelo BotBot. Pedidos pagos no checkout do site também são liberados: cada um recebe uma conta nova (o telefone digitado nunca seleciona uma conta existente), o acesso aparece na página do pedido para o navegador que comprou e segue pelo BotBot para o número informado. A coluna `fulfillment` de `aperte_sales_orders` continua em `awaiting_activation`; a liberação automática fica registrada em `aperte_wa_orders` (`activated_at`, `customer_id`, `error`). Antes de liberar um pedido à mão, conferir essa tabela para não criar conta em dobro. Renovação de quem já é cliente segue pelo link do painel. Falha depois de iniciada a liberação não é repetida, para não gastar créditos em dobro: fica registrada em `aperte_wa_orders.error` e o administrador é avisado.
 
 Variáveis somente no ambiente de publicação: `SIGMA_API_TOKEN`, `BOTBOT_APP_KEY`, `BOTBOT_AUTH_KEY`, `WHATSAPP_BOT_SECRET` (24 caracteres ou mais) e, opcionais, `WHATSAPP_ADMIN`, `SIGMA_API_URL`, `SIGMA_SERVER_NAME` e `SIGMA_PACKAGE_TRIAL|MENSAL|SEMESTRAL|ANUAL`. Sem elas o endpoint responde 401 e o webhook não altera nada. As tabelas `aperte_wa_contacts`, `aperte_wa_orders` e `aperte_wa_messages` são criadas no primeiro uso.
 
-`npm run test:whatsapp`: 20 verificações offline. A criação de teste, a conversão do teste em plano pago e o envio de mensagens ainda precisam de validação com as contas reais.
+`npm run test:whatsapp`: 23 verificações offline. A criação de teste, a conversão do teste em plano pago e o envio de mensagens ainda precisam de validação com as contas reais.
 
 ## Verificações locais
 
