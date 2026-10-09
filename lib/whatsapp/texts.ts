@@ -22,7 +22,11 @@ export const statusText = (customer: SigmaCustomer) => customer.is_trial === 'YE
   : `Seu acesso Aperte Play:\n\n${access(customer)}\n\nPara renovar: ${plansText()}`;
 export const pixIntroText = (order: SalesOrder) => `✅ *${order.plan_name}* — ${money(order.amount_cents)} (${order.period})\n\nA próxima mensagem traz o *Pix copia e cola*. Copie o código inteiro, abra o app do seu banco, escolha Pix → Copia e cola e pague.\n\nO código vale por 30 minutos. A confirmação chega aqui; se não chegar em 1 minuto depois de pagar, responda *paguei*.`;
 export const pixUnavailableText = 'Não consegui gerar o Pix agora. Tente de novo em alguns minutos ou fale com o atendimento respondendo esta mensagem.';
-export const paidText = (order: SalesOrder, customer: SigmaCustomer) => `✅ *Pagamento confirmado!* Obrigado.\n\n*Plano:* ${order.plan_name}\n${access(customer)}\n\nSeu acesso continua no mesmo aplicativo, sem mudar nada. Bom play! ▶️`;
+// Sent to first-time buyers and to renewals alike: it carries the install steps and reassures those already watching.
+export function paidText(order: SalesOrder, customer: SigmaCustomer) {
+  const dns = server(customer);
+  return `✅ *Pagamento confirmado!* Obrigado.\n\n*Plano:* ${order.plan_name}\n${access(customer)}\n\n📲 Para assistir, instale *LOTUS* (código 2050), *RX PURPLE* (código 41494302) ou *ZINK PLAYER* e entre com o usuário e a senha.${dns ? ` Se o aplicativo pedir endereço (DNS/URL): ${dns}` : ''}\n\nSe você já estava assistindo, não precisa mudar nada. Bom play! ▶️`;
+}
 export const pendingText = 'Ainda não recebemos a confirmação do seu Pix. Ela costuma chegar em menos de 1 minuto; se você já pagou, responda *paguei* de novo daqui a pouco.';
 export const reviewText = 'Recebemos seu pagamento ✅ e a equipe está finalizando a liberação do acesso. Você recebe a confirmação aqui em instantes.';
 export const noOrderText = `Não encontrei um pedido de pagamento deste número.\n\n${plansText()}`;
