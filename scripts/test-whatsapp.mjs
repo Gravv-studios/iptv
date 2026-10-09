@@ -218,6 +218,9 @@ await check('BotBot send failures are reported as false and never thrown', async
   await patch(globalThis, {fetch: async (url, options) => { assert.equal(url, 'https://botbot.chat/api/v2/sendText'); assert.equal(options.headers.appKey, 'SYNTHETIC-app'); assert.deepEqual(JSON.parse(options.body), {to: '5531', message: 'oi'}); return Response.json({}, {status: 200}); }}, async () => assert.equal(await botbot.sendText('5531', 'oi'), true));
   await patch(globalThis, {fetch: async () => { throw new Error('timeout'); }}, async () => assert.equal(await botbot.sendText('5531', 'oi'), false));
   await patch(globalThis, {fetch: async () => Response.json({}, {status: 500})}, async () => assert.equal(await botbot.sendText('5531', 'oi'), false));
+  const tried = [];
+  await patch(globalThis, {fetch: async (_url, options) => { const to = JSON.parse(options.body).to; tried.push(to); return Response.json({message: 'invalid 5531999990000'}, {status: to.length === 13 ? 422 : 200}); }}, async () => assert.equal(await botbot.sendText('5531999990000', 'oi'), true));
+  assert.deepEqual(tried, ['5531999990000', '553199990000']);
 });
 await check('supplier calls send the bearer token and surface only short error text', async () => {
   await patch(globalThis, {fetch: async (url, options) => { assert.equal(url, 'https://supplier.invalid/api/reseller-api/v1/customers/c%2F1/renew'); assert.equal(options.method, 'POST'); assert.equal(options.headers.Authorization, 'Bearer SYNTHETIC-sigma'); assert.equal(options.redirect, 'error'); return Response.json({data: paidCustomer}); }}, async () => assert.equal((await sigma.renewCustomer('c/1')).username, 'user1'));
