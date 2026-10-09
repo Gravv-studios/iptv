@@ -14,6 +14,9 @@ export async function POST(request: Request) {
   const config = whatsappConfig();
   const key = new URL(request.url).searchParams.get('k') ?? '';
   if (!config.ready || !config.canSend || !timingSafeEqual(Buffer.from(hash(key)), Buffer.from(hash(config.secret)))) return json({error: 'Não autorizado.'}, 401);
+  // Off by default: BotBot also posts the messages the bot itself sends, with the customer's number as sender,
+  // and answering them looped on 09/10/2026. Do not enable before outgoing messages can be told apart.
+  if (process.env.WHATSAPP_HOOK_ENABLED !== 'true') return json({received: true});
   let body: unknown;
   try { body = await readJson(request, 60000); } catch { return json({received: true}); }
   const message = parseHook(body);
