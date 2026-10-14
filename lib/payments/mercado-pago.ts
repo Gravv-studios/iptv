@@ -8,6 +8,7 @@ import type {SalesOrder} from './types';
 import {submissionInput, validateMethod, verifiedProviderOrder} from './validation';
 import {applyPayment, rejectInvalidSubmission} from './repository';
 import {hash} from './security';
+import {sendPurchase} from './meta-conversions';
 
 function client() { return new MercadoPagoConfig({accessToken: requirePaymentConfig().accessToken, options: {timeout: 8000, maxRetries: 0}}); }
 function orders() { return new Order(client()); }
@@ -67,7 +68,9 @@ export function pixBody(order: SalesOrder): CreateOrderRequest {
 }
 export async function persistVerifiedPayment(order: SalesOrder, response: OrderResponse) {
   const validated = verifiedProviderOrder(order, response, await getVerifiedAccount());
-  return await applyPayment(order, validated) ?? order;
+  const updated = await applyPayment(order, validated) ?? order;
+  await sendPurchase(updated).catch(()=>console.error('meta_purchase_pending'));
+  return updated;
 }
 const preCreationErrors = new Set(['json_syntax_error','required_properties','unsupported_properties','minimum_properties','minimum_items','maximum_items','invalid_properties','property_type','property_value','empty_required_header','invalid_idempotency_key_length','order_builder_without_transactions','invalid_order_mode_for_operation','invalid_order_type','exceeded_number_of_transactions','invalid_email_for_sandbox','invalid_total_amount']);
 export function isDefinitiveValidationError(error: unknown) {

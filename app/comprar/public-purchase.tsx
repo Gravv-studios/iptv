@@ -11,6 +11,7 @@ import {customerSupportUrl} from '../../lib/sales';
 import {paymentLabels, type PublicOrder} from '../../lib/payments/types';
 import type {PublicAccess} from '../../lib/whatsapp/texts';
 import {PaymentInstructions} from '../../components/payment-instructions';
+import {checkoutAttribution,trackMeta} from '../../lib/meta-browser';
 import '../mobile-storefront.css';
 import '../public-service.css';
 import './payment.css';
@@ -80,7 +81,8 @@ export default function PublicPurchase({initialPlanId}: {initialPlanId: typeof p
     if (sending.current || !config?.ready) return;
     sending.current = true; setBusy(true); setError('');
     try {
-      const data = await requestJson<{order: PublicOrder}>('/api/checkout', {...customer, planId, requestKey: requestKey.current});
+      const data = await requestJson<{order: PublicOrder}>('/api/checkout', {...customer, planId, requestKey: requestKey.current, attribution:checkoutAttribution()});
+      if(data.order.mode==='production') trackMeta('InitiateCheckout',{currency:'BRL',value:data.order.amount_cents/100,content_ids:[data.order.plan_id],num_items:1},'checkout_'+data.order.id);
       setOrder(data.order); history.replaceState(null, '', '/comprar?plano=' + data.order.plan_id + '&pedido=' + data.order.id);
     } catch (e) {setError(e instanceof Error ? e.message : 'Não foi possível criar o pedido.');}
     finally {sending.current = false; setBusy(false);}

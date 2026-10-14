@@ -6,6 +6,7 @@ import {publicOrder} from '../../../lib/payments/types';
 import {failure, json} from '../../../lib/payments/http';
 import {whatsappConfig} from '../../../lib/whatsapp/config';
 import {linkOrder, senderFromPhone} from '../../../lib/whatsapp/store';
+import {saveAttribution} from '../../../lib/payments/meta-conversions';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
     if (!parsed.success) throw new CheckoutError('INVALID_ORDER', 400, 'Confira o plano, nome, e-mail e WhatsApp.');
     const token = sessionToken(request) ?? newSessionToken();
     const order = await createOrder(parsed.data, sessionHash(token, config.sessionSecret), config.mode);
+    await saveAttribution(order, parsed.data.attribution, request).catch(()=>console.error('meta_attribution_save_failed'));
     // Lets the paid order be activated and the access sent to the WhatsApp typed in the form.
     if (whatsappConfig().ready && order.mode === 'production') await linkOrder(order.id, senderFromPhone(order.phone), 'site').catch(() => console.error('order_link_failed'));
     const secure = new URL(request.url).protocol === 'https:' || process.env.VERCEL === '1';

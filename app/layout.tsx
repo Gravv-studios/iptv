@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./brand.css";
 import {isVercelHosted} from '../lib/hosting';
+import MarketingConsent from '../components/marketing-consent';
 
 export const metadata: Metadata = {
   title: "Aperte Play · Seu momento começa com um play",
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">{children}<MarketingConsent pixelId={process.env.META_TRACKING_ENABLED === 'true' ? process.env.META_PIXEL_ID ?? '' : ''}/></body>
     </html>
   );
 }
