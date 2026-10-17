@@ -17,7 +17,7 @@ async function compile(relative) {
   await writeFile(target, ts.transpileModule(await readFile(path.join(root, relative), 'utf8'), {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true}}).outputText);
 }
 for (const dir of ['lib/payments','lib/whatsapp']) for (const file of await readdir(path.join(root, dir))) if (file.endsWith('.ts')) await compile(dir + '/' + file);
-for (const file of ['lib/domain.ts','lib/offer.ts','app/api/whatsapp/bot/route.ts','app/api/payments/webhook/route.ts']) await compile(file);
+for (const file of ['lib/campaign-attribution.ts','lib/domain.ts','lib/offer.ts','app/api/whatsapp/bot/route.ts','app/api/payments/webhook/route.ts']) await compile(file);
 const require = createRequire(path.join(output, 'tests.cjs'));
 const bot = require('./lib/whatsapp/bot.js');
 const sigma = require('./lib/whatsapp/sigma.js');

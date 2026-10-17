@@ -1,21 +1,22 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {usePathname} from 'next/navigation';
-import {consentKey,loadPixel,trackMeta} from '../lib/meta-browser';
+import {consentKey,loadPixel,trackMeta,captureCampaignAttribution,clearCampaignAttribution} from '../lib/meta-browser';
 export default function MarketingConsent({pixelId}:{pixelId:string}) {
   const [choice,setChoice]=useState<string|null>('loading');
   const [error,setError]=useState('');
   const pathname=usePathname();
   useEffect(()=>{const frame=requestAnimationFrame(()=>{try {setChoice(localStorage.getItem(consentKey));} catch {setChoice(null);}});return()=>cancelAnimationFrame(frame);},[]);
-  useEffect(()=>{if(choice==='accepted'){loadPixel(pixelId); trackMeta('PageView');}},[choice,pixelId,pathname]);
+  useEffect(()=>{if(choice==='accepted'){captureCampaignAttribution(); loadPixel(pixelId); trackMeta('PageView');}},[choice,pixelId,pathname]);
   async function choose(value:string){
     setError('');
     if(value==='rejected') {
       try {localStorage.setItem(consentKey,value);} catch {}
       window.fbq?.('consent','revoke');
+      clearCampaignAttribution();
+      for(const key of ['_fbp','_fbc']) for(const domain of ['',`; Domain=${location.hostname}`, '; Domain=.aperteoplayiptv.com.br']) document.cookie=`${key}=; Max-Age=0; Path=/${domain}`;
       try {const response=await fetch('/api/checkout/privacy',{method:'POST'});if(!response.ok)throw new Error();}
       catch {setError('A medição neste navegador foi interrompida. Não conseguimos atualizar seus pedidos agora; tente recusar novamente.');return;}
-      for(const key of ['_fbp','_fbc']) for(const domain of ['',`; Domain=${location.hostname}`, '; Domain=.aperteoplayiptv.com.br']) document.cookie=`${key}=; Max-Age=0; Path=/${domain}`;
     } else {try {localStorage.setItem(consentKey,value);} catch {} window.fbq?.('consent','grant');}
     setChoice(value);
   }

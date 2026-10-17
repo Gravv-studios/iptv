@@ -1,8 +1,9 @@
 import {createHash} from 'node:crypto';
+import type {Campaign} from '../campaign-attribution';
 import {database} from './repository';
 import type {SalesOrder} from './types';
 
-export type Attribution = {consent: true; fbp?: string; fbc?: string};
+export type Attribution = {consent: true; fbp?: string; fbc?: string; campaign?: Campaign; capturedAt?: number};
 export const purchaseEventId = (id: string) => `purchase_${id}`;
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 export function metaConfig() {

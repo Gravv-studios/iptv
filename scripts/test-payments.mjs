@@ -17,7 +17,7 @@ async function compile(relative) {
   await writeFile(target, ts.transpileModule(await readFile(path.join(root, relative), 'utf8'), {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true}}).outputText);
 }
 for (const dir of ['lib/payments','lib/whatsapp']) for (const file of await readdir(path.join(root, dir))) if (file.endsWith('.ts')) await compile(dir + '/' + file);
-for (const file of ['lib/domain.ts','lib/offer.ts','app/api/checkout/route.ts','app/api/checkout/pay/route.ts','app/api/payments/webhook/route.ts','app/api/checkout/orders/[id]/route.ts']) await compile(file);
+for (const file of ['lib/campaign-attribution.ts','lib/meta-browser.ts','lib/domain.ts','lib/offer.ts','app/api/checkout/route.ts','app/api/checkout/pay/route.ts','app/api/payments/webhook/route.ts','app/api/checkout/orders/[id]/route.ts']) await compile(file);
 await compile('components/payment-instructions.tsx');
 const require = createRequire(path.join(output, 'tests.cjs'));
 const security = require('./lib/payments/security.js');

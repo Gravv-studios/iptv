@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {campaignLabels} from '../campaign-attribution';
 import {CheckoutError} from './config';
 import type {SalesOrder, PaymentStatus, PaymentInstructions} from './types';
 import type {OrderResponse} from 'mercadopago/dist/clients/order/commonTypes';
@@ -7,7 +8,7 @@ export const orderInput = z.object({
   requestKey: z.string().uuid(), planId: z.enum(['mensal','semestral','anual']),
   customerName: z.string().trim().min(3).max(100), email: z.string().trim().email().max(200).transform(s => s.toLowerCase()),
   phone: z.string().transform(s => s.replace(/\D/g, '')).refine(s => /^\d{10,13}$/.test(s)),
-  attribution: z.object({consent:z.literal(true), fbp:z.string().regex(/^fb\.\d+\.\d+\.[\w-]+$/).max(250).optional(), fbc:z.string().regex(/^fb\.\d+\.\d+\.[\w-]+$/).max(500).optional()}).strict().optional().catch(undefined),
+  attribution: z.object({consent:z.literal(true), fbp:z.string().regex(/^fb\.\d+\.\d+\.[\w-]+$/).max(250).optional().catch(undefined), fbc:z.string().regex(/^fb\.\d+\.\d+\.[\w-]+$/).max(500).optional().catch(undefined), campaign:z.unknown().transform(campaignLabels).optional(), capturedAt:z.number().int().positive().refine(value => value <= Date.now()+60000).optional().catch(undefined)}).strict().optional().catch(undefined),
 }).strict();
 const address = z.object({zip_code: z.string().regex(/^\d{8}$/), street_name: z.string().trim().min(1).max(150), street_number: z.string().trim().min(1).max(20), neighborhood: z.string().trim().min(1).max(100), city: z.string().trim().min(1).max(100), federal_unit: z.string().regex(/^[A-Z]{2}$/).optional(), state: z.string().regex(/^[A-Z]{2}$/).optional()}).refine(a => !!(a.state || a.federal_unit));
 const cardType = z.enum(['credit_card','debit_card','prepaid_card']);
