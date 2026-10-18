@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import ts from 'typescript';
+const output=new URL('../outputs/trial-message-tests/',import.meta.url);
+await mkdir(output,{recursive:true});
+await writeFile(new URL('package.json',output),'{"type":"commonjs"}');
+for(const name of ['trial-message','trial-payment-link']) {
+  await writeFile(new URL(name+'.cjs',output),ts.transpileModule(await readFile(new URL('../lib/whatsapp/'+name+'.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText);
+}
+const require=createRequire(import.meta.url);
+const {trialMessage}=require(fileURLToPath(new URL('trial-message.cjs',output)));
+const {trialPaymentLink,validTrialPaymentLink,safeRenewalUrl}=require(fileURLToPath(new URL('trial-payment-link.cjs',output)));
+const secret='synthetic-test-secret-not-production';
+const link=trialPaymentLink('fixture01',secret),params=new URL(link).searchParams;
+assert.ok(validTrialPaymentLink('fixture01',params.get('assinatura'),secret));
+assert.equal(validTrialPaymentLink('fixture02',params.get('assinatura'),secret),false);
+assert.equal(validTrialPaymentLink('fixture01','x',secret),false);
+assert.equal(validTrialPaymentLink('../customers','a'.repeat(64),secret),false);
+assert.equal(validTrialPaymentLink('fixture01',params.get('assinatura'),'different-secret-long-enough'),false);
+assert.equal(safeRenewalUrl('https://painelprimelux.com/#/checkout/fixture'),'https://painelprimelux.com/#/checkout/fixture');
+for(const url of ['https://evil.invalid','https://painelprimelux.com.evil.invalid','http://painelprimelux.com','https://u:p@painelprimelux.com','https://painelprimelux.com:8443']) assert.throws(()=>safeRenewalUrl(url));
+const customer={id:'fixture01',username:'DEMO_USER',password:'DEMO_PASSWORD',created_at:'2026-10-18T04:12:26Z',expires_at:'2026-10-18T08:12:25Z',connections:2,m3u_url:'http://supplier.invalid/get.php?username=DEMO_USER&password=DEMO_PASSWORD&type=m3u_plus&output=mpegts',m3u_url_short:'http://short.invalid/p/DEMO_USER/DEMO_PASSWORD/m3u'};
+const message=trialMessage(customer,link);
+for(const text of ['APERTE PLAY','2060','85304368','48753','4428351','3228791','91728','6977521','18/10/2026, 05:12:25','*Conexões:* 2','output=hls','/DEMO_PASSWORD/hls','/DEMO_PASSWORD/ssiptv',link]) assert.ok(message.includes(text),text);
+assert.ok(!message.includes('9363kddza'));assert.ok(!message.includes('2949djcek'));
+assert.ok(!link.includes(customer.username)&&!link.includes(customer.password));
+const opaque=trialMessage({...customer,m3u_url_short:'https://short.invalid/opaque'},link);
+assert.ok(!opaque.includes('*SSIPTV:*'));
+const absent=trialMessage({...customer,created_at:undefined,connections:undefined,m3u_url_short:undefined},link);
+assert.ok(!absent.includes('*Criado em:*')&&!absent.includes('*Conexões:*')&&!absent.includes('*M3U curto:*'));
+assert.throws(()=>trialMessage({...customer,password:undefined},link));
+await writeFile(new URL('previa-sintetica.txt',output),'PRÉVIA SINTÉTICA — NÃO É UM ACESSO REAL\n\n'+message);
+console.log('OK: mensagem personalizada, dados dinâmicos, 7 códigos, listas, campos ausentes, link assinado, adulteração bloqueada e redirecionamento restrito. '+message.length+' caracteres. Nenhuma mensagem enviada ou acesso criado.');

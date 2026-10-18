@@ -1,10 +1,12 @@
 import {trialHash,trialIdentity} from './trial-limit';
 import {reserveLimitedTrial} from './trial-limit-store';
+import {trialMessage,type TrialAccess} from './trial-message';
+import {trialPaymentLink,safeRenewalUrl} from './trial-payment-link';
 
 const base='https://painelprimelux.com/api/reseller-api/v1';
 // Verified against the active ZEROUM rule and supplier catalogue on 2026-10-18.
 const packageId='7loL7VM1XM',serverId='qK4WrQDeNj';
-type Customer={id:string;whatsapp?:string;username?:string;password?:string;expires_at?:string;m3u_url?:string;renew_url?:string};
+type Customer=TrialAccess;
 type Package={id:string;server_id:string;is_trial:string;name:string;duration:number;duration_in:string};
 async function request<T>(path:string,body?:unknown):Promise<T> {
   const token=process.env.SIGMA_API_TOKEN;
@@ -44,9 +46,11 @@ export async function createLimitedTrial(input:{id:string;phone?:string;name:str
   });
   const c=result.data;
   if(!c?.id || !c.username || !c.password || !c.expires_at || !c.m3u_url || !c.renew_url) throw new Error('trial_response_incomplete');
-  const dns=new URL(c.m3u_url).origin;
-  const pay=new URL(c.renew_url);
-  if(pay.protocol!=='https:'||pay.hostname!=='painelprimelux.com') throw new Error('trial_payment_url_unexpected');
-  const expires=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short',timeStyle:'medium'}).format(new Date(c.expires_at));
-  return {id:String(c.id),reply:`▶️ *Aperte Play — seu teste grátis está liberado!*\n\n✅ *Usuário:* ${c.username}\n✅ *Senha:* ${c.password}\n⏰ *Válido até:* ${expires}\n\n📲 *Como assistir*\nInstale um dos aplicativos abaixo e entre com o usuário e a senha acima:\n\n• *LOTUS* (Samsung, LG, Roku, Android TV, Windows e Mac) — código 2060\n• *RX PURPLE* (LG, Roku, Play Store e Windows) — código 85304368\n• *ZINK PLAYER* (Play Store, Fire TV e Roku)\n\nSe o aplicativo pedir endereço (DNS/URL): ${dns}\n\n💳 *Gostou? Assine por Pix neste link:*\n${pay.href}\n\nAssim que o pagamento é confirmado, seu acesso continua automaticamente, com o mesmo usuário e senha. Não precisa mudar nada no aplicativo.\n\nPrecisa de ajuda? É só responder esta mensagem.`};
+  safeRenewalUrl(c.renew_url);
+  return {id:String(c.id),reply:trialMessage(c,trialPaymentLink(c.id,process.env.WHATSAPP_BOT_SECRET??''))};
+}
+export async function trialRenewalUrl(id:string) {
+  const result=await request<{data:Customer}>('/customers/'+encodeURIComponent(id));
+  if(result.data?.id!==id||!result.data.renew_url) throw new Error('trial_payment_unavailable');
+  return safeRenewalUrl(result.data.renew_url);
 }
