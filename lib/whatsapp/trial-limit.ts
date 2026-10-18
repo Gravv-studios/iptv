@@ -15,6 +15,15 @@ export function trialIdentity(value: unknown): string | null {
   return 'phone:'+digits;
 }
 export const trialHash=(identity:string,secret:string)=>createHmac('sha256',secret).update('trial-lifetime-v1:'+identity).digest('hex');
+// Observe the provider's template without trusting it to issue an access.
+// No raw contact, message or credentials are logged; this never changes eligibility.
+export function trialTagDiagnostic(tag:string,body:unknown,secret:string) {
+  const identity=trialIdentity(tag);
+  const device=body&&typeof body==='object'&&!Array.isArray(body)?trialIdentity((body as Record<string,unknown>).devicePhone):null;
+  return {length:tag.length,kind:identity?.split(':')[0]??null,
+    unresolved:tag.includes('{')||tag.includes('}'),sameAsDevice:!!identity&&identity===device,
+    fingerprint:identity?trialHash(identity,secret):null};
+}
 // Diagnostic shape only: no phone, LID, name, message, credentials or raw body.
 export function trialPayloadShape(body:unknown) {
   const fields=['senderPhone','senderLid','senderId','senderJid','sender','chatId','from','remoteJid','phone','devicePhone','senderName','senderMessage','messageDateTime'];

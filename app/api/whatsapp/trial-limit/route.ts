@@ -1,7 +1,7 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
 import {database} from '../../../../lib/payments/repository';
 import {hash,readJson} from '../../../../lib/payments/security';
-import {limitedTrial} from '../../../../lib/whatsapp/trial-limit';
+import {limitedTrial,trialTagDiagnostic} from '../../../../lib/whatsapp/trial-limit';
 import {markLimitedTrial,reserveLimitedTrial,trialSchema} from '../../../../lib/whatsapp/trial-limit-store';
 import {checkTrialPackage,createLimitedTrial,prepareTrialHistory} from '../../../../lib/whatsapp/trial-limit-supplier';
 export const runtime='nodejs';
@@ -44,6 +44,8 @@ export async function POST(request:Request) {
     }
     if(!await prepared()) return json({error:'not_prepared'},503);
     const body=await readJson(request,16000);
+    const tag=new URL(request.url).searchParams.get('contact_probe');
+    if(tag!==null) console.info('trial_contact_tag',JSON.stringify(trialTagDiagnostic(tag,body,secret)));
     return json(await limitedTrial(body,secret,{reserve:reserveLimitedTrial,mark:markLimitedTrial,create:createLimitedTrial}));
   } catch {
     console.error('trial_limit_unavailable');
