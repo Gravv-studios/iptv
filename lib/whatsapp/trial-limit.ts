@@ -15,6 +15,25 @@ export function trialIdentity(value: unknown): string | null {
   return 'phone:'+digits;
 }
 export const trialHash=(identity:string,secret:string)=>createHmac('sha256',secret).update('trial-lifetime-v1:'+identity).digest('hex');
+// Diagnostic shape only: no phone, LID, name, message, credentials or raw body.
+export function trialPayloadShape(body:unknown) {
+  const fields=['senderPhone','senderLid','senderId','senderJid','sender','chatId','from','remoteJid','phone','devicePhone','senderName','senderMessage','messageDateTime'];
+  const containers=['data','body','payload','message'];
+  const result:Record<string,unknown>={};
+  function describe(value:unknown,prefix='') {
+    if(!value||typeof value!=='object'||Array.isArray(value)) return;
+    const record=value as Record<string,unknown>;
+    for(const key of fields) if(key in record) {
+      const v=record[key];
+      const s=typeof v==='string'?v:typeof v==='number'?String(v):'';
+      result[prefix+key]={type:typeof v,length:s.length,identity:trialIdentity(v)?.split(':')[0]??null,
+        numeric:typeof v==='string'&&/^\d+$/.test(v),jid:typeof v==='string'&&/@/.test(v)};
+    }
+    if(!prefix) for(const key of containers) if(record[key]&&typeof record[key]==='object')describe(record[key],key+'.');
+  }
+  describe(body);
+  return result;
+}
 export function trialSender(body:unknown) {
   if(!body || typeof body!=='object' || Array.isArray(body)) return null;
   const b=body as Record<string,unknown>;
@@ -31,7 +50,10 @@ export type TrialDependencies={
 };
 export async function limitedTrial(body:unknown,secret:string,deps:TrialDependencies) {
   const sender=trialSender(body);
-  if(!sender) return {reply:'Não consegui identificar seu contato para liberar o teste com segurança. Responda *ajuda*.'};
+  if(!sender) {
+    console.warn('trial_sender_unidentified',JSON.stringify(trialPayloadShape(body)));
+    return {reply:'Não consegui identificar seu contato para liberar o teste com segurança. Responda *ajuda*.'};
+  }
   const record=await deps.reserve(sender.ids.map(id=>trialHash(id,secret)));
   if(!record.fresh) return {reply:record.state==='created'||record.state==='historical'?usedTrialReply:pendingTrialReply};
   // Commit BEFORE the external request. Timeout/crash must never reopen eligibility.
