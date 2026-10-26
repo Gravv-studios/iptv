@@ -37,7 +37,7 @@ const faqs = [
   {q: 'Como recebo minhas 5 horas grátis?', a: 'Escolha seu aparelho, se quiser, e toque no botão de teste. O WhatsApp abre com a mensagem pronta. Envie para a equipe, que vai orientar a configuração e confirmar a ativação do seu acesso.'},
   {q: 'Preciso cadastrar um cartão?', a: 'Não. O teste é gratuito, sem cartão e sem cobrança automática. Você só paga se decidir contratar um plano depois.'},
   {q: 'Vai funcionar no meu aparelho?', a: 'Conte à equipe qual é o modelo da sua TV, celular, tablet ou computador. Ela confirma a compatibilidade e o aplicativo indicado antes de ativar seu teste. Escolher um aparelho aqui não garante compatibilidade.'},
-  {q: 'O que acontece quando o teste acaba?', a: 'Você decide se quer continuar. Escolha o mensal por R$ 25, o semestral por R$ 100 ou o anual por R$ 170. O teste não se transforma em assinatura automaticamente.'},
+  {q: 'O que acontece quando o teste acaba?', a: 'Você decide se quer continuar. Escolha o mensal por R$ 25, o semestral por R$ 100 ou o anual por R$ 99,99. O teste não se transforma em assinatura automaticamente.'},
   {q: 'Quais conteúdos estão disponíveis?', a: 'Peça o catálogo à equipe antes de contratar. A lista de conteúdos depende do fornecedor e deve ser confirmada com o atendimento. As imagens do site são ilustrativas.'},
   {q: 'Como faço para comprar ou renovar?', a: isVercelHosted ? 'Escolha um plano e abra o checkout no site. O pagamento com Pix, cartões e boleto será processado pelo Mercado Pago assim que a conta recebedora for ativada. A página informa quando estiver disponível. A ativação do acesso e as renovações são orientadas pela equipe, sem renovação automática.' : 'Escolha um plano e siga para o pagamento. O fluxo prevê Pix e cartão, e a renovação é solicitada pela área do cliente. Nesta apresentação, os pagamentos e a entrega do acesso são simulados: não há cobrança real nem renovação automática.'},
 ];
@@ -149,7 +149,7 @@ export default function Storefront() {
                   <p className="ap-plan-period">{plan.period} de acesso</p>
                   <p className="ap-plan-amount">{money(plan.amount)}</p>
                   <p className="ap-plan-note">{months > 1 ? <>Equivale a {money(Math.round(plan.amount / months))} por mês · <strong>economize {money(plans[0].amount * months - plan.amount)}</strong></> : 'Um mês para aproveitar'}</p>
-                  <ul><li><UserRound size={16}/>{isVercelHosted ? 'Ativação orientada pela equipe' : 'Seu acesso na área do cliente'}</li><li><Headphones size={16}/>Orientações para configurar</li><li><ShieldCheck size={16}/>Você escolhe quando renovar</li></ul>
+                  <ul>{featured && <li><UserRound size={16}/>2 conexões incluídas</li>}<li><UserRound size={16}/>{isVercelHosted ? 'Ativação orientada pela equipe' : 'Seu acesso na área do cliente'}</li><li><Headphones size={16}/>Orientações para configurar</li><li><ShieldCheck size={16}/>Você escolhe quando renovar</li></ul>
                   <a className={'ap-button ' + (featured ? '' : 'ap-button-ghost')} href={'/comprar?plano=' + plan.id}>Escolher {name.toLowerCase()}<ArrowRight size={18}/></a>
                 </article>
               );

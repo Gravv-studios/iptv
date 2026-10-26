@@ -6,7 +6,7 @@ import MarketingConsent from '../components/marketing-consent';
 
 export const metadata: Metadata = {
   title: "Aperte Play · Seu momento começa com um play",
-  description: "Solicite 5 horas grátis de Aperte Play pelo WhatsApp. Planos mensal por R$ 25, semestral por R$ 100 e anual por R$ 170. " + (isVercelHosted ? "Checkout no site com Mercado Pago em ativação." : "Pagamentos no site em demonstração."),
+  description: "Solicite 5 horas grátis de Aperte Play pelo WhatsApp. Planos mensal por R$ 25, semestral por R$ 100 e anual por R$ 99,99. " + (isVercelHosted ? "Checkout no site com Mercado Pago em ativação." : "Pagamentos no site em demonstração."),
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

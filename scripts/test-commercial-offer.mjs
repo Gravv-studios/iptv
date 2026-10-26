@@ -14,7 +14,7 @@ const domain = await import(moduleUrl(domainCode));
 const offer = await import(offerUrl);
 
 assert.deepEqual(domain.plans.map(p=>[p.id,p.period,p.amount]),[
-  ['mensal','1 mês',2500],['semestral','6 meses',10000],['anual','12 meses',17000],
+  ['mensal','1 mês',2500],['semestral','6 meses',10000],['anual','12 meses',9999],
 ]);
 assert.equal(domain.getPlan('trimestral'),undefined,'Retired plan is not for sale.');
 assert.equal(domain.getPlan('anual').days,365,'Annual demo provisioning duration.');

@@ -3,7 +3,7 @@ export const DAY=86400000;
 export const plans=[
  {id:'mensal',name:'Aperte Play Mensal',period:'1 mês',days:30,amount:2500,tag:'Um mês para aproveitar'},
  {id:'semestral',name:'Aperte Play Semestral',period:'6 meses',days:180,amount:10000,tag:'Economize R$ 50 em relação ao mensal'},
- {id:'anual',name:'Aperte Play Anual',period:'12 meses',days:365,amount:17000,tag:'Economize R$ 130 em relação ao mensal'}
+ {id:'anual',name:'Aperte Play Anual',period:'12 meses',days:365,amount:9999,tag:'Oferta anual • 2 conexões incluídas'}
 ] as const;
 // Old orders keep their original identifier, price and duration in history.
 export type PlanId=typeof plans[number]['id']|'trimestral';
